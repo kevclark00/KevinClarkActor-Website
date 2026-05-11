@@ -1,0 +1,678 @@
+/* --------------------------------------------------------------------------
+   Design 14 — Asymmetric Grid
+   12-column grid. Modules sit at deliberately offset, non-obvious positions.
+   Big silent gaps between blocks. Faint grid lines fade in/out as part of a
+   sequenced sleek hero entrance:
+     Stage 1 (0ms)    — grid lines fade IN (very faint).
+     Stage 2 (300ms)  — modules slide in from different directions.
+     Stage 3 (1100ms) — grid lines begin to fade OUT, gone by 1700ms.
+   Pittsburgh hooks scattered as standalone modules (coordinates, bridges).
+   -------------------------------------------------------------------------- */
+
+.d14 {
+  --bg: #0a0a0a;
+  --fg: #f1ece1;
+  --fg-muted: #a8a29b;
+  --fg-dim: #6b6660;
+  --rule: rgba(241, 236, 225, 0.10);
+  --rule-strong: rgba(241, 236, 225, 0.28);
+  --accent: #e9e2d4;
+
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+  position: relative;
+  overflow-x: hidden;
+  padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+}
+
+/* ----- Grid lines (Stage 1 / Stage 3) ----- */
+.d14__grid-lines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  opacity: 0;
+  animation: d14-lines-cycle 1700ms var(--ease-out) forwards;
+}
+
+.d14__grid-line {
+  width: 1px;
+  height: 100%;
+  background: var(--rule);
+  transform: translateX(-0.5px);
+  grid-row: 1;
+}
+.d14__grid-line:nth-child(1)  { grid-column: 2;  }
+.d14__grid-line:nth-child(2)  { grid-column: 3;  }
+.d14__grid-line:nth-child(3)  { grid-column: 4;  }
+.d14__grid-line:nth-child(4)  { grid-column: 5;  }
+.d14__grid-line:nth-child(5)  { grid-column: 6;  }
+.d14__grid-line:nth-child(6)  { grid-column: 7;  }
+.d14__grid-line:nth-child(7)  { grid-column: 8;  }
+.d14__grid-line:nth-child(8)  { grid-column: 9;  }
+.d14__grid-line:nth-child(9)  { grid-column: 10; }
+.d14__grid-line:nth-child(10) { grid-column: 11; }
+.d14__grid-line:nth-child(11) { grid-column: 12; }
+
+@keyframes d14-lines-cycle {
+  0%   { opacity: 0; }
+  18%  { opacity: 0.85; }   /* visible by ~300ms */
+  65%  { opacity: 0.85; }   /* hold through stage 2 (~1100ms) */
+  100% { opacity: 0; }      /* gone by 1700ms */
+}
+
+/* ----- Canvas ----- */
+.d14__canvas {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: min-content;
+  column-gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  row-gap: clamp(2.5rem, 6vw, 5rem);
+}
+
+/* ----- Module base ----- */
+.d14__mod {
+  position: relative;
+  opacity: 0;
+  animation: d14-fade-in 800ms var(--ease-out) 300ms forwards;
+}
+
+@keyframes d14-fade-in {
+  to { opacity: 1; }
+}
+
+/* Per-module slide directions. The 300ms delay is the start of Stage 2. */
+.d14__mark {
+  grid-column: 2 / 6;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  transform: translateY(-1.25rem);
+  animation:
+    d14-fade-in 800ms var(--ease-out) 300ms forwards,
+    d14-from-top 900ms var(--ease-out) 300ms forwards;
+}
+
+.d14__mark-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  display: inline-block;
+}
+.d14__mark-sep {
+  color: var(--fg-dim);
+}
+.d14__mark-tag {
+  color: var(--fg);
+}
+
+@keyframes d14-from-top {
+  from { transform: translateY(-1.25rem); }
+  to   { transform: translateY(0); }
+}
+
+.d14__coords {
+  grid-column: 9 / 13;
+  grid-row: 1;
+  justify-self: end;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  transform: translate(0.75rem, -0.75rem);
+  animation:
+    d14-fade-in 800ms var(--ease-out) 380ms forwards,
+    d14-from-top-right 1000ms var(--ease-out) 380ms forwards;
+  border: 1px solid var(--rule-strong);
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.d14__coords-eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.d14__coords-list {
+  margin: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.d14__coords-row {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 0.5rem;
+  text-align: left;
+}
+.d14__coords-row dt {
+  color: var(--fg-dim);
+}
+.d14__coords-row dd {
+  margin: 0;
+  color: var(--fg);
+}
+
+@keyframes d14-from-top-right {
+  from { transform: translate(0.75rem, -0.75rem); }
+  to   { transform: translate(0, 0); }
+}
+
+/* Hero (H1) — col 2-6, row 2. Slides from left. */
+.d14__hero {
+  grid-column: 2 / 7;
+  grid-row: 2;
+  transform: translateX(-1.5rem);
+  animation:
+    d14-fade-in 900ms var(--ease-out) 460ms forwards,
+    d14-from-left 1000ms var(--ease-out) 460ms forwards;
+}
+
+.d14__hero-eyebrow {
+  margin: 0 0 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.d14__h1 {
+  font-family: var(--font-sans);
+  font-size: clamp(2.75rem, 7.5vw, 6rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  margin: 0;
+}
+
+.d14__hero-sub {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  color: var(--fg-muted);
+  max-width: 30ch;
+}
+
+@keyframes d14-from-left {
+  from { transform: translateX(-1.5rem); }
+  to   { transform: translateX(0); }
+}
+
+/* Hero photo — col 8-11, row 1-2, slides from right. Portrait orientation. */
+.d14__photo--hero {
+  grid-column: 8 / 12;
+  grid-row: 1 / span 2;
+  align-self: end;
+  transform: translateX(1.5rem);
+  animation:
+    d14-fade-in 1000ms var(--ease-out) 520ms forwards,
+    d14-from-right 1100ms var(--ease-out) 520ms forwards;
+}
+
+.d14__photo {
+  margin: 0;
+  position: relative;
+}
+
+.d14__photo img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: grayscale(0.15) contrast(1.02);
+}
+
+/* hero photo respects natural portrait orientation — no forced aspect ratio */
+.d14__photo--hero img {
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.d14__photo figcaption {
+  margin-top: 0.625rem;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+.d14__photo-no {
+  color: var(--fg-muted);
+}
+
+@keyframes d14-from-right {
+  from { transform: translateX(1.5rem); }
+  to   { transform: translateX(0); }
+}
+
+/* Works — col 3-7, slides from below-left */
+.d14__works {
+  grid-column: 3 / 8;
+  margin-top: clamp(1rem, 3vw, 2rem);
+  transform: translate(-0.75rem, 1rem);
+  animation:
+    d14-fade-in 900ms var(--ease-out) 620ms forwards,
+    d14-from-bl 1100ms var(--ease-out) 620ms forwards;
+}
+
+@keyframes d14-from-bl {
+  from { transform: translate(-0.75rem, 1rem); }
+  to   { transform: translate(0, 0); }
+}
+
+.d14__sec-head {
+  margin-bottom: 1.5rem;
+  border-top: 1px solid var(--rule-strong);
+  padding-top: 0.875rem;
+}
+.d14__eyebrow {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+.d14__sec-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  color: var(--fg);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.d14__credits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.d14__credit {
+  display: grid;
+  grid-template-columns: 2.5rem 1.4fr 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.95rem;
+}
+.d14__credit-no {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--fg-dim);
+  letter-spacing: 0.1em;
+}
+.d14__credit-brand {
+  color: var(--fg);
+  font-weight: 500;
+}
+.d14__credit-role {
+  color: var(--fg-muted);
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+/* Side photo — col 9-12, offset down. Landscape feel. */
+.d14__photo--side {
+  grid-column: 9 / 13;
+  margin-top: clamp(2rem, 6vw, 5rem);
+  transform: translateX(1rem);
+  animation:
+    d14-fade-in 1000ms var(--ease-out) 720ms forwards,
+    d14-from-right 1100ms var(--ease-out) 720ms forwards;
+}
+.d14__photo--side img {
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+/* Video — col 2-9, big landscape plate */
+.d14__video {
+  grid-column: 2 / 10;
+  margin-top: clamp(2.5rem, 7vw, 5rem);
+  transform: translateY(1rem);
+  animation:
+    d14-fade-in 900ms var(--ease-out) 820ms forwards,
+    d14-from-bottom 1100ms var(--ease-out) 820ms forwards;
+}
+
+@keyframes d14-from-bottom {
+  from { transform: translateY(1rem); }
+  to   { transform: translateY(0); }
+}
+
+.d14__reel {
+  margin: 0;
+}
+
+.d14__reel-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #050505;
+  border: 1px solid var(--rule-strong);
+  overflow: hidden;
+}
+
+.d14__reel-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.2) brightness(0.85);
+}
+
+.d14__reel-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.35) 100%);
+  transition: background 240ms var(--ease-out);
+}
+.d14__reel-play:hover {
+  background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.20) 100%);
+}
+
+.d14__reel-play-triangle {
+  width: 0;
+  height: 0;
+  border-left: 22px solid var(--fg);
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  margin-left: 6px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+.d14__reel-cap {
+  margin-top: 0.625rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+/* Bridges datum — col 10-13, sits offset to the right of the video */
+.d14__bridges {
+  grid-column: 10 / 13;
+  margin-top: clamp(2.5rem, 7vw, 5rem);
+  align-self: end;
+  text-align: right;
+  transform: translateX(1rem);
+  animation:
+    d14-fade-in 900ms var(--ease-out) 880ms forwards,
+    d14-from-right 1100ms var(--ease-out) 880ms forwards;
+}
+.d14__bridges-num {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+}
+.d14__bridges-label {
+  margin: 0.625rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  max-width: 26ch;
+  margin-left: auto;
+  line-height: 1.5;
+}
+
+/* Info / Bio — col 4-8, offset to the right of true center */
+.d14__info {
+  grid-column: 4 / 9;
+  margin-top: clamp(2.5rem, 7vw, 5rem);
+  transform: translateY(1rem);
+  animation:
+    d14-fade-in 900ms var(--ease-out) 940ms forwards,
+    d14-from-bottom 1100ms var(--ease-out) 940ms forwards;
+}
+
+.d14__bio {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+  line-height: 1.55;
+  color: var(--fg);
+  max-width: 52ch;
+}
+
+.d14__edu {
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: 0.5rem;
+}
+.d14__edu-row {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+.d14__edu-row dt {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  padding-top: 0.1rem;
+}
+.d14__edu-row dd {
+  margin: 0;
+  color: var(--fg);
+}
+
+/* Info photo — col 9-12, small. Slides from right. */
+.d14__photo--info {
+  grid-column: 9 / 12;
+  margin-top: clamp(2.5rem, 7vw, 5rem);
+  align-self: start;
+  transform: translateX(1rem);
+  animation:
+    d14-fade-in 1000ms var(--ease-out) 1000ms forwards,
+    d14-from-right 1100ms var(--ease-out) 1000ms forwards;
+}
+.d14__photo--info img {
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+/* Representation — col 2-6, prominent. Slides from left. */
+.d14__rep {
+  grid-column: 2 / 7;
+  margin-top: clamp(2.5rem, 7vw, 5rem);
+  padding: 1.5rem 1.75rem;
+  border: 1px solid var(--rule-strong);
+  background: rgba(255, 255, 255, 0.02);
+  transform: translateX(-1rem);
+  animation:
+    d14-fade-in 900ms var(--ease-out) 1080ms forwards,
+    d14-from-left 1100ms var(--ease-out) 1080ms forwards;
+}
+
+.d14__rep-list {
+  margin: 1rem 0 0;
+  display: grid;
+  gap: 0.625rem;
+}
+.d14__rep-row {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 1rem;
+  font-size: 0.95rem;
+}
+.d14__rep-row dt {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  padding-top: 0.2rem;
+}
+.d14__rep-row dd {
+  margin: 0;
+}
+.d14__phone {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  border-bottom: 1px solid var(--rule-strong);
+  padding-bottom: 0.1rem;
+  transition: color 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+.d14__phone:hover {
+  color: var(--fg);
+  border-color: var(--fg);
+}
+.d14__rep-note {
+  margin: 1rem 0 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--fg-muted);
+  font-size: 0.95rem;
+}
+
+/* Closing photo — col 7-11, asymmetric down-right placement */
+.d14__photo--close {
+  grid-column: 7 / 12;
+  margin-top: clamp(2.5rem, 7vw, 5rem);
+  transform: translateY(1rem);
+  animation:
+    d14-fade-in 1000ms var(--ease-out) 1180ms forwards,
+    d14-from-bottom 1100ms var(--ease-out) 1180ms forwards;
+}
+.d14__photo--close img {
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+/* Footer — col 3-10, offset */
+.d14__footer {
+  grid-column: 3 / 11;
+  margin-top: clamp(3rem, 8vw, 6rem);
+  transform: translateY(1rem);
+  animation:
+    d14-fade-in 900ms var(--ease-out) 1280ms forwards,
+    d14-from-bottom 1100ms var(--ease-out) 1280ms forwards;
+}
+
+.d14__colophon {
+  margin: 1.75rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — collapse to a single readable column on small screens.
+   The asymmetric idea persists on desktop; on mobile we let modules stack.
+   -------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .d14__canvas {
+    grid-template-columns: 1fr;
+    row-gap: 2.5rem;
+  }
+  .d14__mark,
+  .d14__coords,
+  .d14__hero,
+  .d14__photo--hero,
+  .d14__works,
+  .d14__photo--side,
+  .d14__video,
+  .d14__bridges,
+  .d14__info,
+  .d14__photo--info,
+  .d14__rep,
+  .d14__photo--close,
+  .d14__footer {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    margin-top: 0;
+    justify-self: stretch;
+    text-align: left;
+  }
+  .d14__coords {
+    text-align: left;
+  }
+  .d14__bridges {
+    text-align: left;
+  }
+  .d14__bridges-label {
+    margin-left: 0;
+  }
+  .d14__grid-lines {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion — kill the entrance sequence + parallax; leave everything
+   in its final state. global.css already caps animation-duration; we just
+   make sure transforms collapse to zero so nothing is left offset.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .d14__grid-lines {
+    display: none;
+  }
+  .d14__mod,
+  .d14__mark,
+  .d14__coords,
+  .d14__hero,
+  .d14__photo--hero,
+  .d14__works,
+  .d14__photo--side,
+  .d14__video,
+  .d14__bridges,
+  .d14__info,
+  .d14__photo--info,
+  .d14__rep,
+  .d14__photo--close,
+  .d14__footer {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

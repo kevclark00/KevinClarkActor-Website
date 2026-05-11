@@ -1,0 +1,572 @@
+/* Design 01 — Brutalist Bleed / Data-Sheet Mono */
+.d01 {
+  --bg: #f3efe7;
+  --fg: #0a0a0a;
+  --fg-soft: rgba(10, 10, 10, 0.62);
+  --fg-faint: rgba(10, 10, 10, 0.38);
+  --line: rgba(10, 10, 10, 0.18);
+  --rule: 2px solid var(--fg);
+  --hairline: 1px solid var(--fg);
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: clamp(1rem, 2vw, 2rem);
+  gap: clamp(1.5rem, 3vw, 3rem);
+  --switcher-bg: rgba(10, 10, 10, 0.9);
+  --switcher-fg: #f3efe7;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   HERO — sequenced entrance
+   stage 1: topbar fades down       (delay 0ms)
+   stage 2: H1 clip-path wipe       (delay 200ms)
+   stage 3: photo scales/slides in  (delay 450ms)
+   stage 4: meta-dl fades up        (delay 700ms)
+   ─────────────────────────────────────────────────────────── */
+
+.d01__topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border-top: var(--rule);
+  padding-top: 0.5rem;
+  animation: d01-fade-down 600ms var(--ease-out) both;
+  animation-delay: 0ms;
+}
+
+.d01__main {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: end;
+  gap: clamp(1rem, 3vw, 3rem);
+  flex: 1;
+}
+
+@media (min-width: 900px) {
+  .d01__main {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.d01__h1 {
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(4rem, 19vw, 19rem);
+  letter-spacing: -0.06em;
+  line-height: 0.78;
+  text-transform: uppercase;
+  margin: 0;
+  word-break: break-word;
+  /* clip-path wipe + lift */
+  animation: d01-wipe 1100ms var(--ease-out) both;
+  animation-delay: 200ms;
+}
+
+.d01__photo {
+  aspect-ratio: 3 / 4;
+  width: 100%;
+  background: #1a1a1a;
+  overflow: hidden;
+  border: var(--rule);
+  animation: d01-photo-in 900ms var(--ease-out) both;
+  animation-delay: 450ms;
+}
+
+.d01__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.2) contrast(1.05);
+}
+
+.d01__meta {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  border-top: var(--rule);
+  padding-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  animation: d01-fade-up 700ms var(--ease-out) both;
+  animation-delay: 700ms;
+}
+
+.d01__meta dt {
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.d01__meta dd {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* ─── Keyframes ──────────────────────────────────────────── */
+
+@keyframes d01-fade-down {
+  from { opacity: 0; transform: translateY(-0.5rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes d01-fade-up {
+  from { opacity: 0; transform: translateY(0.75rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes d01-wipe {
+  from {
+    opacity: 0;
+    transform: translateY(0.25em);
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes d01-photo-in {
+  from {
+    opacity: 0;
+    transform: translateY(2rem) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes d01-pop {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Section heads — shared brutalist data-sheet header
+   ─────────────────────────────────────────────────────────── */
+
+.d01__section-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 1rem;
+  border-top: var(--rule);
+  padding-top: 0.6rem;
+  margin-bottom: clamp(1rem, 2vw, 1.75rem);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.d01__section-num {
+  font-weight: 700;
+}
+
+.d01__section-title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.d01__section-count {
+  color: var(--fg-soft);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   WORKS — rowed credit list
+   mono brand left · small italic role right · hairline rules
+   each row pops in via animation-delay stagger
+   ─────────────────────────────────────────────────────────── */
+
+.d01__works {
+  display: block;
+}
+
+.d01__credits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--rule);
+}
+
+.d01__credit {
+  display: grid;
+  grid-template-columns: 2.5rem 4.5rem 1fr auto auto;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  padding: clamp(0.75rem, 1.5vw, 1.25rem) 0.25rem;
+  border-bottom: var(--hairline);
+  font-family: var(--font-mono);
+  animation: d01-pop 700ms var(--ease-out) both;
+  animation-delay: var(--pop-delay, 0ms);
+}
+
+.d01__credit:last-child {
+  border-bottom: var(--rule);
+}
+
+.d01__credit-idx {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  color: var(--fg-soft);
+}
+
+.d01__credit-photo {
+  width: 4.5rem;
+  height: 4.5rem;
+  border: var(--hairline);
+  overflow: hidden;
+  background: #1a1a1a;
+  display: grid;
+  place-items: center;
+}
+
+.d01__credit-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.35) contrast(1.05);
+}
+
+.d01__credit-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.d01__credit-brand {
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.d01__credit-role {
+  font-style: italic;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--fg-soft);
+  text-transform: lowercase;
+}
+
+.d01__credit-year {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: var(--fg-soft);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .d01__credit {
+    grid-template-columns: 2rem 3.25rem 1fr auto;
+    gap: 0.75rem;
+  }
+  .d01__credit-photo {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+  .d01__credit-year {
+    grid-column: 3 / -1;
+    justify-self: end;
+    font-size: 0.65rem;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   VIDEO — brutalist 16:9 placeholder player
+   block-style play UI, no chrome, mono HUD
+   ─────────────────────────────────────────────────────────── */
+
+.d01__video {
+  display: block;
+}
+
+.d01__player {
+  margin: 0;
+  border: var(--rule);
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+.d01__player-stage {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.d01__player-media {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  filter: grayscale(0.3) contrast(1.05) brightness(0.78);
+  background: #1a1a1a;
+}
+
+.d01__player-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.875rem 1.25rem;
+  background: var(--bg);
+  color: var(--fg);
+  border: var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: not-allowed;
+  transition: transform 220ms var(--ease-out), background 220ms var(--ease-out);
+}
+
+.d01__player-play:disabled {
+  opacity: 0.92;
+}
+
+.d01__player-play-mark {
+  width: 0;
+  height: 0;
+  border-left: 0.7rem solid var(--fg);
+  border-top: 0.45rem solid transparent;
+  border-bottom: 0.45rem solid transparent;
+}
+
+.d01__player-play-label {
+  display: inline-block;
+}
+
+.d01__player-hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--bg);
+  color: var(--fg);
+  border-top: var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.d01__player-caption {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border-top: var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+@media (max-width: 720px) {
+  .d01__player-play {
+    padding: 0.6rem 0.85rem;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    gap: 0.6rem;
+  }
+  .d01__player-hud {
+    font-size: 0.55rem;
+    letter-spacing: 0.16em;
+    padding: 0.45rem 0.6rem;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   INFO — bio + rep block, data-sheet voice
+   ─────────────────────────────────────────────────────────── */
+
+.d01__info {
+  display: block;
+}
+
+.d01__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: var(--hairline);
+}
+
+.d01__info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+@media (min-width: 900px) {
+  .d01__info-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.d01__bio {
+  font-family: var(--font-mono);
+  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+  margin: 0 0 1.75rem;
+  max-width: 56ch;
+}
+
+.d01__data {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-top: var(--rule);
+  margin: 0;
+}
+
+.d01__data > div {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0.25rem;
+  border-bottom: var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+
+.d01__data dt {
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  font-weight: 600;
+}
+
+.d01__data dd {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* Rep block — bordered hairline-emphasized */
+.d01__rep {
+  border: var(--rule);
+  padding: clamp(1rem, 2vw, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: transparent;
+  align-self: start;
+}
+
+.d01__rep-kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  padding-bottom: 0.5rem;
+  border-bottom: var(--hairline);
+}
+
+.d01__rep-agency {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.d01__rep-phone {
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: var(--rule);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  transition: opacity 160ms var(--ease-out);
+}
+
+.d01__rep-phone:hover,
+.d01__rep-phone:focus-visible {
+  opacity: 0.7;
+}
+
+.d01__rep-closer {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  color: var(--fg-soft);
+  text-transform: uppercase;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   FOOTER
+   ─────────────────────────────────────────────────────────── */
+
+.d01__footer {
+  margin-top: clamp(2rem, 5vw, 5rem);
+  border-top: var(--rule);
+  padding-top: 1.5rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Reduced motion — disable all entrance + pop animations
+   ─────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .d01__topbar,
+  .d01__h1,
+  .d01__photo,
+  .d01__meta,
+  .d01__credit {
+    animation: none;
+  }
+}

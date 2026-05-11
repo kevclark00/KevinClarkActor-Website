@@ -1,0 +1,163 @@
+/* --------------------------------------------------------------------------
+   IntakeForm — calm, type-driven, design-neutral.
+   Uses tokens from src/styles/global.css. Restraint over flash.
+   -------------------------------------------------------------------------- */
+
+.kc-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+  width: 100%;
+  max-width: 560px;
+  font-family: var(--font-sans);
+  color: var(--fg);
+}
+
+.kc-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.kc-form__field--wide {
+  grid-column: 1 / -1;
+}
+
+.kc-form__field > span {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.kc-form__field input,
+.kc-form__field textarea {
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
+  padding: 0.55rem 0 0.5rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--fg);
+  border-radius: 0;
+  outline: none;
+  transition: border-color 220ms var(--ease-out);
+}
+
+.kc-form__field textarea {
+  resize: vertical;
+  min-height: 5.5rem;
+  padding-top: 0.6rem;
+}
+
+.kc-form__field input:focus,
+.kc-form__field textarea:focus {
+  border-bottom-color: var(--fg);
+}
+
+.kc-form__field input::placeholder,
+.kc-form__field textarea::placeholder {
+  color: var(--fg-dim);
+}
+
+.kc-form__honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.kc-form__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.25rem;
+}
+
+.kc-form__submit {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 220ms var(--ease-out), color 220ms var(--ease-out), background 220ms var(--ease-out);
+}
+
+.kc-form__submit:hover:not(:disabled) {
+  border-color: var(--fg);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.kc-form__submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.kc-form__error {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: #d97565;
+}
+
+.kc-form--sent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 560px;
+  padding: 1.25rem 0;
+  font-family: var(--font-sans);
+  color: var(--fg);
+}
+
+.kc-form--sent p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.kc-form__reset {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  cursor: pointer;
+  border-bottom: 1px solid var(--line-strong);
+  transition: color 220ms var(--ease-out), border-color 220ms var(--ease-out);
+}
+
+.kc-form__reset:hover {
+  color: var(--fg);
+  border-bottom-color: var(--fg);
+}
+
+@media (max-width: 540px) {
+  .kc-form {
+    grid-template-columns: 1fr;
+  }
+  .kc-form__actions {
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,552 @@
+/* ==========================================================================
+   D13 — Negative Space
+   Gallery-wall feel. ~80% empty canvas. Each "island" of content is small
+   and given heavy breathing room. Tiny mono labels live at the edges.
+   ========================================================================== */
+
+.design.d13 {
+  --d13-bg: #f3efe6;       /* warm cream */
+  --d13-paper: #ebe5d7;    /* slightly darker cream for plates */
+  --d13-fg: #15130f;       /* near-black */
+  --d13-muted: #6e655a;
+  --d13-dim: #9a9388;
+  --d13-line: rgba(21, 19, 15, 0.14);
+  --d13-line-strong: rgba(21, 19, 15, 0.34);
+
+  /* The signature spacing token — used everywhere to push islands apart. */
+  --d13-gap: clamp(6rem, 14vw, 14rem);
+
+  background: var(--d13-bg);
+  color: var(--d13-fg);
+  font-family: var(--font-sans);
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Local switcher tokens — dark pill on cream. */
+.design.d13 {
+  --switcher-bg: rgba(21, 19, 15, 0.82);
+  --switcher-fg: var(--d13-bg);
+}
+
+/* Shared edge-label mono treatment. */
+.d13__edge,
+.d13__corner {
+  position: absolute;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+  white-space: nowrap;
+}
+
+.d13__edge--tl { top: clamp(1.25rem, 3vw, 2.25rem); left: clamp(1.25rem, 3vw, 2.25rem); }
+.d13__edge--br { bottom: clamp(1.25rem, 3vw, 2.25rem); right: clamp(1.25rem, 3vw, 2.25rem); }
+
+/* ==========================================================================
+   HERO — single small "Kevin Clark" mark, centered. Tiny corner labels.
+   ========================================================================== */
+.d13__hero {
+  position: relative;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: clamp(2rem, 6vw, 4rem);
+}
+
+.d13__corner--tl { top: clamp(1.25rem, 3vw, 2.25rem); left: clamp(1.25rem, 3vw, 2.25rem); }
+.d13__corner--tr { top: clamp(1.25rem, 3vw, 2.25rem); right: clamp(1.25rem, 3vw, 2.25rem); }
+.d13__corner--bl { bottom: clamp(1.25rem, 3vw, 2.25rem); left: clamp(1.25rem, 3vw, 2.25rem); }
+.d13__corner--br { bottom: clamp(1.25rem, 3vw, 2.25rem); right: clamp(1.25rem, 3vw, 2.25rem); }
+
+/* The "Kevin Clark" mark — small, centered, near-imperceptible motion. */
+.d13__name {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-size: clamp(1.5rem, 3.6vw, 2.6rem);
+  color: var(--d13-fg);
+  text-align: center;
+}
+
+.d13__name .kc-word { display: inline-block; }
+
+/* ----- Sequenced sleek hero entrance -----
+   Stage 1 (0ms):    top-left corner fades in
+   Stage 2 (200ms):  top-right corner fades in
+   Stage 3 (400ms):  bottom-left corner fades in
+   Stage 4 (600ms):  bottom-right corner fades in
+   Stage 5 (1200ms): "Kevin Clark" mark fades in last with a barely-perceptible scale-in
+*/
+.d13__hero [data-stage] {
+  opacity: 0;
+  transform: translateY(4px);
+  animation: d13-fade 900ms var(--ease-out) forwards;
+}
+.d13__hero [data-stage="1"] { animation-delay: 0ms; }
+.d13__hero [data-stage="2"] { animation-delay: 200ms; }
+.d13__hero [data-stage="3"] { animation-delay: 400ms; }
+.d13__hero [data-stage="4"] { animation-delay: 600ms; }
+.d13__hero [data-stage="5"] {
+  animation-name: d13-name-in;
+  animation-duration: 1400ms;
+  animation-delay: 1200ms;
+  transform-origin: center;
+}
+
+@keyframes d13-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes d13-name-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ==========================================================================
+   Shared section scaffolding — every island sits in a wide canvas with
+   absolute-positioned tiny labels and a small content cluster.
+   ========================================================================== */
+.d13__works,
+.d13__video-section,
+.d13__info,
+.d13__footer {
+  position: relative;
+  padding-top: var(--d13-gap);
+  padding-bottom: var(--d13-gap);
+  padding-left: clamp(1.5rem, 6vw, 4rem);
+  padding-right: clamp(1.5rem, 6vw, 4rem);
+  min-height: 100dvh;
+}
+
+.d13__h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  line-height: 1;
+  margin: 0;
+  color: var(--d13-fg);
+}
+
+.d13__h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.25rem, 2.4vw, 1.65rem);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.d13__deck {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+}
+
+.d13__eyebrow {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+}
+
+/* ==========================================================================
+   WORKS — 4 credits as widely-spaced minimal rows.
+   ========================================================================== */
+.d13__works-head {
+  max-width: 32rem;
+  margin: 0 auto 0;
+  text-align: center;
+}
+
+.d13__credits {
+  list-style: none;
+  margin: clamp(4rem, 10vw, 8rem) auto 0;
+  padding: 0;
+  max-width: 56rem;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 7vw, 5.5rem);
+}
+
+.d13__credit {
+  display: grid;
+  grid-template-columns: 3rem 1fr auto;
+  align-items: baseline;
+  gap: 1.5rem;
+  padding: 0 0 1.25rem;
+  border-bottom: 1px solid var(--d13-line);
+}
+
+.d13__credit-no {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--d13-dim);
+}
+
+.d13__credit-brand {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+  letter-spacing: -0.01em;
+  color: var(--d13-fg);
+}
+
+.d13__credit-meta {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+}
+
+/* Plates — small, given heavy whitespace. */
+.d13__plate {
+  position: relative;
+  margin: clamp(4rem, 10vw, 8rem) auto 0;
+  background: var(--d13-paper);
+  border: 1px solid var(--d13-line);
+  padding: 0.5rem;
+}
+
+.d13__plate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.d13__plate figcaption {
+  margin-top: 0.625rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+}
+
+/* Portrait plate — small, off-center-right. Aspect respects portrait orientation. */
+.d13__plate--portrait {
+  width: clamp(11rem, 22vw, 16rem);
+  aspect-ratio: 3 / 4;
+  margin-right: clamp(2rem, 8vw, 6rem);
+  margin-left: auto;
+}
+
+/* Landscape plate — small, off-center-left. */
+.d13__plate--landscape {
+  width: clamp(16rem, 36vw, 26rem);
+  aspect-ratio: 3 / 2;
+  margin-left: clamp(2rem, 8vw, 6rem);
+  margin-right: auto;
+}
+
+/* Small plate — tiny, far right. */
+.d13__plate--small {
+  width: clamp(9rem, 18vw, 13rem);
+  aspect-ratio: 3 / 4;
+  margin-right: clamp(2rem, 8vw, 6rem);
+  margin-left: auto;
+}
+
+/* ==========================================================================
+   VIDEO — small 16:9 player floating in canvas.
+   ========================================================================== */
+.d13__video-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.d13__video-head {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.d13__reel {
+  margin: clamp(4rem, 10vw, 8rem) auto 0;
+  width: min(640px, 60vw);
+}
+
+.d13__reel-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--d13-paper);
+  border: 1px solid var(--d13-line-strong);
+  overflow: hidden;
+}
+
+.d13__reel-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Posters shown via poster attr; no src on purpose (placeholder). */
+}
+
+.d13__reel-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  cursor: pointer;
+  transition: background 280ms var(--ease-out);
+}
+
+.d13__reel-play:hover { background: rgba(21, 19, 15, 0.12); }
+
+.d13__reel-triangle {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 14px 0 14px 22px;
+  border-color: transparent transparent transparent var(--d13-bg);
+  filter: drop-shadow(0 1px 6px rgba(21, 19, 15, 0.4));
+  margin-left: 4px;
+}
+
+.d13__reel-cap {
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+}
+
+/* ==========================================================================
+   INFO — bio in a narrow column, alone on a generous spread.
+   ========================================================================== */
+.d13__info-head {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.d13__bio-col {
+  margin: clamp(4rem, 10vw, 8rem) auto 0;
+  max-width: 32rem;
+  text-align: left;
+}
+
+.d13__bio {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  line-height: 1.6;
+  margin: 0;
+  color: var(--d13-fg);
+}
+
+.d13__bio-note {
+  margin: 1.5rem 0 0;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--d13-muted);
+}
+
+.d13__facts {
+  margin: clamp(4rem, 10vw, 7rem) auto 0;
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.d13__fact {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--d13-line);
+}
+
+.d13__fact dt {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--d13-dim);
+  margin: 0;
+}
+
+.d13__fact dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--d13-fg);
+}
+
+.d13__rep {
+  margin: clamp(4rem, 10vw, 8rem) auto 0;
+  max-width: 26rem;
+  text-align: center;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border: 1px solid var(--d13-line);
+  background: transparent;
+}
+
+.d13__rep-phone {
+  margin: 0.625rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  letter-spacing: 0.12em;
+}
+
+.d13__rep-phone a {
+  color: var(--d13-fg);
+  border-bottom: 1px solid var(--d13-line-strong);
+  transition: border-color 220ms var(--ease-out);
+}
+
+.d13__rep-phone a:hover { border-bottom-color: var(--d13-fg); }
+
+.d13__rep-note {
+  margin: 1rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+}
+
+/* ==========================================================================
+   FOOTER — intake form, alone.
+   ========================================================================== */
+.d13__foot-head {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.d13__form-col {
+  margin: clamp(4rem, 10vw, 8rem) auto 0;
+  max-width: 30rem;
+}
+
+.d13__colophon {
+  margin: clamp(4rem, 10vw, 7rem) auto 0;
+  max-width: 56rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--d13-line);
+}
+
+/* ==========================================================================
+   Intake form — cream-on-cream restyle so it sits quietly on the canvas.
+   ========================================================================== */
+.d13 .kc-form {
+  background: transparent;
+}
+
+.d13 .kc-form__field span {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--d13-muted);
+}
+
+.d13 .kc-form__field input,
+.d13 .kc-form__field textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--d13-line-strong);
+  color: var(--d13-fg);
+  padding: 0.5rem 0;
+}
+
+.d13 .kc-form__field input:focus,
+.d13 .kc-form__field textarea:focus {
+  outline: none;
+  border-bottom-color: var(--d13-fg);
+}
+
+.d13 .kc-form__submit {
+  background: var(--d13-fg);
+  color: var(--d13-bg);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.875rem 1.5rem;
+  border: 1px solid var(--d13-fg);
+  transition: background 220ms var(--ease-out), color 220ms var(--ease-out);
+}
+
+.d13 .kc-form__submit:hover:not(:disabled) {
+  background: transparent;
+  color: var(--d13-fg);
+}
+
+/* ==========================================================================
+   Responsive — collapse the wide negative-space scaffolding gracefully.
+   ========================================================================== */
+@media (max-width: 720px) {
+  .design.d13 { --d13-gap: clamp(4rem, 18vw, 8rem); }
+
+  .d13__credit {
+    grid-template-columns: 2rem 1fr;
+    row-gap: 0.25rem;
+  }
+  .d13__credit-meta { grid-column: 2; }
+
+  .d13__plate--portrait,
+  .d13__plate--landscape,
+  .d13__plate--small {
+    margin-left: auto;
+    margin-right: auto;
+    width: min(80%, 18rem);
+  }
+
+  .d13__reel { width: 86vw; }
+
+  .d13__colophon {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion — strip the sequenced entrance to a single static state.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .d13__hero [data-stage] {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

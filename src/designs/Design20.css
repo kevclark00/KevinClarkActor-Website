@@ -1,0 +1,664 @@
+/* --------------------------------------------------------------------------
+   Design 20 — Diagonal
+   A thin -32deg accent slash cuts each viewport from upper-right to lower-
+   left. Content blocks align to that line; the H1 tilts -10deg to ride it;
+   photos clip on the diagonal so they meet the slash cleanly. The slash
+   doubles as Pittsburgh's quiet "Three Rivers axis" hook.
+   -------------------------------------------------------------------------- */
+
+.design.d20 {
+  --d20-bg: #0b0b0c;
+  --d20-fg: #ece6da;
+  --d20-fg-dim: #807a70;
+  --d20-fg-mute: #4f4a44;
+  --d20-line: rgba(236, 230, 218, 0.34);
+  --d20-line-soft: rgba(236, 230, 218, 0.12);
+  --d20-accent: #ece6da;
+
+  /* The page angle. Tilted up-right; H1 + photo clips key off this. */
+  --d20-angle: -32deg;
+  --d20-h1-tilt: -10deg;
+
+  --d20-gutter: clamp(1.25rem, 4vw, 3rem);
+  --d20-section-y: clamp(5rem, 12vh, 9rem);
+
+  position: relative;
+  background: var(--d20-bg);
+  color: var(--d20-fg);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------------------------
+   The diagonal slash — a thin hairline drawn at the page angle.
+   - .d20__slash--hero: full-bleed across the hero, 1px, animated draw.
+   - .d20__slash--small: decorative hairline near each section head.
+   The element is positioned at the center of its container, sized wide
+   enough to cover the diagonal of a 100% × 100% box, then rotated.
+   ------------------------------------------------------------------------ */
+
+.d20__slash {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 1px;
+  background: var(--d20-line);
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.d20__slash--hero {
+  width: 180%;
+  transform: translate(-50%, -50%) rotate(var(--d20-angle)) scaleX(0);
+  transform-origin: left center;
+  animation: d20-slash-draw 800ms var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+
+@keyframes d20-slash-draw {
+  to {
+    transform: translate(-50%, -50%) rotate(var(--d20-angle)) scaleX(1);
+  }
+}
+
+/* Small decorative hairlines near each non-hero section. They sit above the
+   section head, offset left so they read as a section punctuation mark. */
+.d20__slash--small {
+  width: clamp(8rem, 18vw, 16rem);
+  left: var(--d20-gutter);
+  top: calc(var(--d20-section-y) - 1.5rem);
+  transform: rotate(var(--d20-angle));
+  transform-origin: left center;
+  background: var(--d20-line-soft);
+}
+
+/* ------------------------------------------------------------------------
+   HERO
+   ------------------------------------------------------------------------ */
+
+.d20__hero {
+  position: relative;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--d20-section-y) var(--d20-gutter);
+  overflow: hidden;
+}
+
+.d20__hero-frame {
+  position: relative;
+  width: min(100%, var(--maxw));
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: center;
+}
+
+.d20__hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  align-items: flex-start;
+}
+
+.d20__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d20-fg-dim);
+}
+
+/* H1 tilts subtly to ride the diagonal. Keeping it small enough to stay
+   readable and the tilt below 12deg. */
+.d20__h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, 9vw, 8rem);
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  color: var(--d20-fg);
+  font-weight: 500;
+  transform-origin: left center;
+  transform: rotate(var(--d20-h1-tilt));
+  display: inline-block;
+}
+
+.d20__h1 .kc-word {
+  display: block;
+}
+
+.d20__hero-tag {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d20-fg);
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--d20-line-soft);
+}
+
+/* Photo clips on the diagonal — the slash effectively shaves the top-right
+   and bottom-left corners. clip-path uses the same -32deg angle by laying
+   out four polygon points along it. */
+.d20__hero-photo {
+  margin: 0;
+  width: min(38vw, 32rem);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #161616;
+  justify-self: end;
+  clip-path: polygon(0 18%, 100% 0, 100% 82%, 0 100%);
+}
+
+.d20__hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.35) contrast(1.05);
+}
+
+.d20__hero-note {
+  position: absolute;
+  right: var(--d20-gutter);
+  bottom: var(--d20-gutter);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d20-fg-mute);
+}
+
+/* ------------------------------------------------------------------------
+   Hero stage timing — sequenced sleek entrance.
+   Stage 1: slash drawn (handled on .d20__slash--hero).
+   Stage 2 (400ms): H1 fades up; tilt is preserved.
+   Stage 3 (800ms): photo reveals via diagonal clip-path interpolation.
+   Stage 4 (1100ms): metadata fades along the diagonal.
+   ------------------------------------------------------------------------ */
+
+.d20__hero [data-stage] {
+  opacity: 0;
+  animation-duration: 900ms;
+  animation-timing-function: var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+  animation-fill-mode: forwards;
+}
+
+.d20__hero [data-stage="2"] {
+  /* H1: animate opacity + translate while keeping the static tilt. */
+  animation-name: d20-h1-in;
+  animation-delay: 400ms;
+}
+
+.d20__hero [data-stage="3"] {
+  /* Photo: clip-path collapses to a thin diagonal sliver and opens out. */
+  clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%);
+  animation-name: d20-photo-in;
+  animation-delay: 800ms;
+}
+
+.d20__hero [data-stage="4"] {
+  transform: translateY(0.4rem);
+  animation-name: d20-fade-along;
+  animation-delay: 1100ms;
+}
+
+@keyframes d20-h1-in {
+  from {
+    opacity: 0;
+    transform: rotate(var(--d20-h1-tilt)) translate(-1rem, 0.6rem);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(var(--d20-h1-tilt)) translate(0, 0);
+  }
+}
+
+@keyframes d20-photo-in {
+  to {
+    opacity: 1;
+    clip-path: polygon(0 18%, 100% 0, 100% 82%, 0 100%);
+  }
+}
+
+@keyframes d20-fade-along {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------------------------
+   Shared section scaffold
+   ------------------------------------------------------------------------ */
+
+.d20__section,
+.d20__footer {
+  position: relative;
+  padding: var(--d20-section-y) var(--d20-gutter);
+  width: min(100%, var(--maxw));
+  margin: 0 auto;
+}
+
+.d20__section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding-bottom: 3rem;
+}
+
+.d20__section-num {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d20-fg-dim);
+}
+
+.d20__section-h {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.5rem, 3.2vw, 2.5rem);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--d20-fg);
+}
+
+/* ------------------------------------------------------------------------
+   WORKS — credits stair-step rightward following the diagonal.
+   Each row is indented by --step * 1.5rem so the column descends along
+   the angle.
+   ------------------------------------------------------------------------ */
+
+.d20__credits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.d20__credit {
+  display: grid;
+  grid-template-columns: minmax(0, 18rem) 1fr;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  /* Stair-step offset: rows trace the page angle. */
+  margin-left: calc(var(--step, 0) * 1.5rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--d20-line-soft);
+}
+
+.d20__credit[data-has-photo="false"] {
+  grid-template-columns: 4rem 1fr;
+}
+
+.d20__credit-photo {
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #161616;
+  /* Same diagonal shave as the hero photo, slightly softer. */
+  clip-path: polygon(0 14%, 100% 0, 100% 86%, 0 100%);
+}
+
+.d20__credit-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.4) contrast(1.05);
+}
+
+.d20__credit-tick {
+  display: block;
+  width: 4rem;
+  height: 1px;
+  background: var(--d20-line);
+  transform: rotate(var(--d20-angle));
+  transform-origin: left center;
+}
+
+.d20__credit-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  align-items: flex-start;
+}
+
+.d20__credit-index {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d20-fg-dim);
+}
+
+.d20__credit-brand {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 2.6vw, 1.875rem);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--d20-fg);
+  letter-spacing: -0.005em;
+}
+
+.d20__credit-role {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--d20-fg-dim);
+}
+
+/* ------------------------------------------------------------------------
+   VIDEO — landscape 16:9 frame, clipped on the diagonal.
+   ------------------------------------------------------------------------ */
+
+.d20__video-frame {
+  margin: 0;
+  width: min(92%, 64rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.d20__video-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #0a0a0a;
+  /* The diagonal shave is gentler here to preserve the 16:9 reading. */
+  clip-path: polygon(0 6%, 100% 0, 100% 94%, 0 100%);
+}
+
+.d20__video-el {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.5) contrast(1.04) brightness(0.92);
+}
+
+/* A visible diagonal hairline running through the poster — page axis
+   passing through the film. */
+.d20__video-slash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140%;
+  height: 1px;
+  background: rgba(236, 230, 218, 0.22);
+  transform: translate(-50%, -50%) rotate(var(--d20-angle));
+  pointer-events: none;
+}
+
+.d20__video-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.d20__video-play-glyph {
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 1px solid var(--d20-fg);
+  border-radius: 999px;
+  position: relative;
+  background: rgba(11, 11, 12, 0.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.d20__video-play-glyph::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-left: 0.95rem solid var(--d20-fg);
+  border-top: 0.6rem solid transparent;
+  border-bottom: 0.6rem solid transparent;
+}
+
+.d20__video-caption {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--d20-fg-dim);
+}
+
+/* ------------------------------------------------------------------------
+   INFO — two columns with the right column offset down to trace the angle.
+   ------------------------------------------------------------------------ */
+
+.d20__info-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(2rem, 5vw, 5rem);
+  align-items: flex-start;
+}
+
+.d20__info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Right column drops down so its top edge meets the diagonal sweep
+   coming off the bio. */
+.d20__info-col--media {
+  padding-top: clamp(2rem, 6vw, 5rem);
+}
+
+.d20__bio {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.6;
+  max-width: 36rem;
+  color: var(--d20-fg);
+}
+
+.d20__facts {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.d20__fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.d20__fact dt {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d20-fg-dim);
+}
+
+.d20__fact dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--d20-fg);
+}
+
+.d20__info-photo {
+  margin: 0;
+  width: 100%;
+  max-width: 24rem;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #161616;
+  clip-path: polygon(0 16%, 100% 0, 100% 84%, 0 100%);
+}
+
+.d20__info-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.4) contrast(1.05);
+}
+
+.d20__rep {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--d20-line-soft);
+  max-width: 30rem;
+}
+
+.d20__rep-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d20-fg-dim);
+}
+
+.d20__rep-agency {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 2.2vw, 1.625rem);
+  font-style: italic;
+  color: var(--d20-fg);
+}
+
+.d20__rep-phone {
+  font-family: var(--font-mono);
+  font-size: clamp(1.5rem, 2.8vw, 2.125rem);
+  letter-spacing: 0.04em;
+  color: var(--d20-fg);
+  transition: opacity 220ms var(--ease-out, ease-out);
+}
+
+.d20__rep-phone:hover {
+  opacity: 0.7;
+}
+
+.d20__rep-note {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--d20-fg-dim);
+}
+
+/* ------------------------------------------------------------------------
+   FOOTER
+   ------------------------------------------------------------------------ */
+
+.d20__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  border-top: 1px solid var(--d20-line-soft);
+  padding-bottom: calc(var(--d20-section-y) + 4rem);
+}
+
+.d20__footer-head {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding-bottom: 2rem;
+}
+
+.d20__footer-form {
+  width: min(36rem, 100%);
+}
+
+.d20__footer-meta {
+  display: flex;
+  justify-content: space-between;
+  width: min(36rem, 100%);
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--d20-line-soft);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d20-fg-dim);
+}
+
+/* ------------------------------------------------------------------------
+   Mobile — straighten the credit stair-step, drop H1 tilt slightly, keep
+   the slashes but shrink them to fit.
+   ------------------------------------------------------------------------ */
+
+@media (max-width: 760px) {
+  .design.d20 {
+    --d20-h1-tilt: -6deg;
+  }
+
+  .d20__hero-frame,
+  .d20__info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .d20__hero-photo,
+  .d20__info-photo {
+    width: min(80vw, 22rem);
+    justify-self: start;
+  }
+
+  .d20__info-col--media {
+    padding-top: 0;
+  }
+
+  .d20__credit {
+    grid-template-columns: minmax(0, 12rem) 1fr;
+    margin-left: 0;
+    gap: 1.5rem;
+  }
+
+  .d20__credit[data-has-photo="false"] {
+    grid-template-columns: 3rem 1fr;
+  }
+
+  .d20__hero-note {
+    right: auto;
+    left: var(--d20-gutter);
+  }
+}
+
+/* ------------------------------------------------------------------------
+   Reduced motion — pin everything to its resting state.
+   ------------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .d20__slash--hero {
+    animation: none;
+    transform: translate(-50%, -50%) rotate(var(--d20-angle)) scaleX(1);
+  }
+
+  .d20__hero [data-stage] {
+    opacity: 1;
+    animation: none;
+  }
+
+  .d20__hero [data-stage="2"] {
+    transform: rotate(var(--d20-h1-tilt));
+  }
+
+  .d20__hero [data-stage="3"] {
+    clip-path: polygon(0 18%, 100% 0, 100% 82%, 0 100%);
+  }
+
+  .d20__hero [data-stage="4"] {
+    transform: translateY(0);
+  }
+}

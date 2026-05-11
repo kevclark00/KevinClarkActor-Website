@@ -1,0 +1,526 @@
+/* --------------------------------------------------------------------------
+   Design 19 — EDGE-ALIGNED
+   Each section is a 100dvh frame. Content lives at the four corners; the
+   middle is reserved for a single hero element (H1, photo, bio, form). The
+   shared anchor primitive is `.d19__edge--tl|tr|bl|br`.
+   -------------------------------------------------------------------------- */
+
+.d19 {
+  --d19-gutter: clamp(1.25rem, 3.2vw, 2.5rem);
+  --d19-rule: rgba(245, 241, 234, 0.18);
+  --d19-rule-strong: rgba(245, 241, 234, 0.42);
+  --d19-mono: var(--font-mono);
+  --d19-serif: var(--font-serif);
+
+  display: block;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---------- Shared section + edge primitives -------------------------- */
+
+.d19__hero,
+.d19__works,
+.d19__video,
+.d19__info,
+.d19__footer {
+  position: relative;
+  min-height: 100dvh;
+  padding: var(--d19-gutter);
+  box-shadow: inset 0 -1px 0 var(--d19-rule);
+}
+
+.d19__edge {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--d19-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  pointer-events: none;
+}
+
+.d19__edge > * { pointer-events: auto; }
+
+.d19__edge--tl { top: var(--d19-gutter); left: var(--d19-gutter); align-items: flex-start; text-align: left; }
+.d19__edge--tr { top: var(--d19-gutter); right: var(--d19-gutter); align-items: flex-end; text-align: right; }
+.d19__edge--bl { bottom: var(--d19-gutter); left: var(--d19-gutter); align-items: flex-start; text-align: left; }
+.d19__edge--br { bottom: var(--d19-gutter); right: var(--d19-gutter); align-items: flex-end; text-align: right; }
+
+.d19__edge-tick {
+  font-size: 0.66rem;
+  color: var(--fg-dim);
+  letter-spacing: 0.22em;
+}
+
+.d19__edge-line {
+  font-size: 0.78rem;
+  color: var(--fg);
+  letter-spacing: 0.14em;
+  margin: 0;
+  font-weight: 500;
+  /* h2 reset when this class is on a heading */
+  font-family: inherit;
+  text-transform: inherit;
+}
+
+.d19__edge-link {
+  text-decoration: none;
+  border-bottom: 1px solid var(--d19-rule);
+  padding-bottom: 0.15rem;
+  transition: border-color 220ms var(--ease-out), color 220ms var(--ease-out);
+}
+
+.d19__edge-link:hover { border-color: var(--d19-rule-strong); color: var(--accent); }
+
+/* ---------- Stage 1–5 entrance, gated on html.-loaded ----------------- */
+
+.d19__edge[data-stage],
+.d19__hero-center[data-stage] {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+html.-loaded .d19__edge[data-stage="1"] { animation: d19EdgeDownIn 700ms var(--ease-out) 0ms forwards; }
+html.-loaded .d19__edge[data-stage="2"] { animation: d19EdgeDownIn 700ms var(--ease-out) 200ms forwards; }
+html.-loaded .d19__edge[data-stage="3"] { animation: d19EdgeUpIn   700ms var(--ease-out) 400ms forwards; }
+html.-loaded .d19__edge[data-stage="4"] { animation: d19EdgeUpIn   700ms var(--ease-out) 600ms forwards; }
+html.-loaded .d19__hero-center[data-stage="5"] {
+  animation: d19CenterLand 900ms var(--ease-out) 1000ms forwards;
+}
+
+@keyframes d19EdgeDownIn {
+  0%   { opacity: 0; transform: translate3d(0, -32px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes d19EdgeUpIn {
+  0%   { opacity: 0; transform: translate3d(0, 32px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes d19CenterLand {
+  0%   { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.985); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* ---------- HERO ------------------------------------------------------ */
+
+.d19__hero {
+  display: grid;
+  place-items: center;
+}
+
+.d19__hero-center {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1rem;
+  max-width: min(86vw, 1100px);
+}
+
+.d19__h1 {
+  font-family: var(--d19-serif);
+  font-weight: 600;
+  font-size: clamp(3.5rem, 11vw, 9.5rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  color: var(--fg);
+  margin: 0;
+}
+
+.d19__h1 .kc-word + .kc-word { font-style: italic; color: var(--accent); }
+
+.d19__hero-tag {
+  font-family: var(--d19-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin: 0;
+}
+
+/* ---------- Section heads (interior sections) ------------------------- */
+
+.d19__section-head {
+  position: absolute;
+  top: var(--d19-gutter);
+  left: var(--d19-gutter);
+  right: var(--d19-gutter);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 1rem;
+  font-family: var(--d19-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  border-bottom: 1px solid var(--d19-rule);
+  padding-bottom: 0.65rem;
+}
+
+.d19__section-num { color: var(--fg-dim); }
+
+.d19__section-h {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--fg);
+  margin: 0;
+}
+
+.d19__section-meta { color: var(--fg-dim); }
+
+/* ---------- WORKS ---------------------------------------------------- */
+
+.d19__works {
+  padding-top: calc(var(--d19-gutter) * 2.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.d19__credits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.d19__credit {
+  position: relative;
+  min-height: 60dvh;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "role  role  role"
+    "index center brand"
+    "detail year  year";
+  align-items: center;
+  border-top: 1px solid var(--d19-rule);
+  padding: clamp(1.5rem, 4vw, 3rem) 0;
+}
+
+.d19__credit:last-child { border-bottom: 1px solid var(--d19-rule); }
+
+.d19__credit-role {
+  grid-area: role;
+  justify-self: center;
+  font-family: var(--d19-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  padding-bottom: clamp(1.5rem, 4vw, 3rem);
+}
+
+.d19__credit-index {
+  grid-area: index;
+  justify-self: start;
+  font-family: var(--d19-mono);
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  letter-spacing: 0.24em;
+  color: var(--fg-dim);
+}
+
+.d19__credit-brand {
+  grid-area: brand;
+  justify-self: end;
+  text-align: right;
+  font-family: var(--d19-serif);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3.6vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  max-width: 9ch;
+}
+
+.d19__credit-year {
+  grid-area: year;
+  justify-self: end;
+  font-family: var(--d19-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  color: var(--fg-muted);
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+}
+
+.d19__credit-detail {
+  grid-area: detail;
+  justify-self: start;
+  font-family: var(--d19-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+  max-width: 26ch;
+}
+
+.d19__credit-photo {
+  grid-area: center;
+  margin: 0;
+  justify-self: center;
+  width: clamp(180px, 22vw, 320px);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--d19-rule);
+}
+
+.d19__credit-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.18) contrast(1.02);
+  transition: filter 600ms var(--ease-out);
+}
+
+.d19__credit:hover .d19__credit-photo img { filter: grayscale(0) contrast(1.06); }
+
+.d19__credit-void {
+  grid-area: center;
+  width: 1px;
+  height: clamp(60px, 9vw, 110px);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--d19-rule-strong) 30%,
+    var(--d19-rule-strong) 70%,
+    transparent
+  );
+}
+
+/* ---------- VIDEO ----------------------------------------------------- */
+
+.d19__video {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* The video edges share the global edge styles; this just makes sure they
+   don't run their entrance animation (which only fires in the hero). */
+.d19__video-edge { opacity: 1; }
+
+.d19__video-frame {
+  position: absolute;
+  right: var(--d19-gutter);
+  bottom: var(--d19-gutter);
+  margin: 0;
+  width: clamp(280px, 56vw, 780px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  z-index: 1;
+}
+
+.d19__video-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-elev);
+  border: 1px solid var(--d19-rule);
+  overflow: hidden;
+}
+
+.d19__video-el {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: var(--bg-elev);
+}
+
+.d19__video-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 10, 0.12) 0%,
+    rgba(10, 10, 10, 0.45) 100%
+  );
+  transition: background 320ms var(--ease-out);
+}
+
+.d19__video-frame:hover .d19__video-play {
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 10, 0.02) 0%,
+    rgba(10, 10, 10, 0.32) 100%
+  );
+}
+
+.d19__video-play-glyph {
+  width: 54px;
+  height: 54px;
+  border: 1px solid var(--fg);
+  border-radius: 999px;
+  position: relative;
+  background: rgba(10, 10, 10, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 320ms var(--ease-out), background 320ms var(--ease-out);
+}
+
+.d19__video-play-glyph::after {
+  content: '';
+  position: absolute;
+  left: 54%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid var(--fg);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.d19__video-frame:hover .d19__video-play-glyph { transform: scale(1.06); background: rgba(10, 10, 10, 0.5); }
+
+.d19__video-caption {
+  font-family: var(--d19-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  text-align: right;
+}
+
+/* ---------- INFO ------------------------------------------------------ */
+
+.d19__info {
+  display: grid;
+  place-items: center;
+}
+
+.d19__info-center {
+  max-width: min(640px, 84vw);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  align-items: center;
+  text-align: center;
+}
+
+.d19__bio {
+  font-family: var(--d19-serif);
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1.65vw, 1.45rem);
+  line-height: 1.55;
+  color: var(--fg);
+  margin: 0;
+  text-wrap: balance;
+}
+
+.d19__info-photo {
+  margin: 0;
+  width: clamp(180px, 22vw, 280px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--d19-rule);
+}
+
+.d19__info-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- FOOTER ---------------------------------------------------- */
+
+.d19__footer {
+  display: grid;
+  place-items: center;
+  padding-top: calc(var(--d19-gutter) * 1.5);
+  padding-bottom: calc(var(--d19-gutter) * 1.5);
+}
+
+.d19__footer-photo {
+  position: absolute;
+  bottom: calc(var(--d19-gutter) * 3.25);
+  left: var(--d19-gutter);
+  margin: 0;
+  width: clamp(120px, 14vw, 200px);
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.d19__footer-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 1px solid var(--d19-rule);
+  flex: 1;
+}
+
+.d19__footer-photo figcaption {
+  font-family: var(--d19-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.d19__footer-form {
+  width: min(560px, 86vw);
+  border: 1px solid var(--d19-rule);
+  padding: clamp(1.25rem, 2.4vw, 2rem);
+  background: rgba(20, 20, 20, 0.55);
+}
+
+/* ---------- Responsive ------------------------------------------------ */
+
+@media (max-width: 720px) {
+  .d19__edge { font-size: 0.6rem; gap: 0.2rem; }
+  .d19__edge-tick { font-size: 0.55rem; }
+  .d19__edge-line { font-size: 0.66rem; letter-spacing: 0.12em; }
+
+  .d19__credit {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "role   role"
+      "index  brand"
+      "center center"
+      "detail year";
+    min-height: auto;
+    gap: 1rem;
+  }
+
+  .d19__credit-photo { width: 60vw; }
+  .d19__credit-void { height: 60px; }
+  .d19__credit-brand { max-width: none; font-size: clamp(1.4rem, 6vw, 2rem); }
+
+  .d19__video-frame { width: calc(100% - calc(var(--d19-gutter) * 2)); }
+  .d19__footer-photo { display: none; }
+}
+
+/* ---------- Reduced motion ------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .d19__edge[data-stage],
+  .d19__hero-center[data-stage] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}

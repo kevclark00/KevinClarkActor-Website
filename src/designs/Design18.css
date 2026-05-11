@@ -1,0 +1,701 @@
+/* ============================================================================
+   Design 18 — OFF-BASELINE
+   ----------------------------------------------------------------------------
+   A modular grid drives placement. Each text element receives a deliberate
+   translateY offset from a fixed four-step pattern:
+
+       --off-up-lg   : -0.45em
+       --off-down-sm : +0.18em
+       --off-up-sm   : -0.12em
+       --off-down-lg : +0.42em
+
+   The pattern repeats — kinetic-but-still, never random. The hero sequences:
+       Stage 1 (0ms)    : grid lines flash on, behind everything.
+       Stage 2 (300ms)  : words drop in to their final off-baseline positions.
+       Stage 3 (800ms)  : grid lines fade out.
+       Stage 4 (1100ms) : photo settles.
+
+   Reduced motion: every transform / animation collapses to its end state.
+   ========================================================================= */
+
+.d18 {
+  --off-up-lg:   -0.45em;
+  --off-down-sm:  0.18em;
+  --off-up-sm:   -0.12em;
+  --off-down-lg:  0.42em;
+
+  --d18-line:        rgba(245, 241, 234, 0.12);
+  --d18-line-strong: rgba(245, 241, 234, 0.28);
+  --d18-bg:          var(--bg);
+  --d18-fg:          var(--fg);
+  --d18-fg-muted:    var(--fg-muted);
+  --d18-fg-dim:      var(--fg-dim);
+
+  display: block;
+  background: var(--d18-bg);
+  color: var(--d18-fg);
+  padding: 0;
+  margin: 0;
+  overflow-x: clip;
+}
+
+/* The off-baseline utility classes. Every text element that wants to ride
+   the rhythm gets exactly one of these. Transforms compose with stage
+   animations via CSS variables (the keyframes target translateY only when
+   the variable is unset; here we override translateY entirely). */
+.d18 .d18__off--up-lg   { transform: translateY(var(--off-up-lg)); }
+.d18 .d18__off--down-sm { transform: translateY(var(--off-down-sm)); }
+.d18 .d18__off--up-sm   { transform: translateY(var(--off-up-sm)); }
+.d18 .d18__off--down-lg { transform: translateY(var(--off-down-lg)); }
+
+/* ----------------------------------------------------------------------------
+   HERO
+   --------------------------------------------------------------------------*/
+
+.d18__hero {
+  position: relative;
+  min-height: 100dvh;
+  padding: clamp(2rem, 6vw, 5rem);
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr 1fr 0.7fr;
+  grid-template-rows:
+    clamp(2.5rem, 7vh, 5rem)
+    clamp(7rem, 22vh, 13rem)
+    clamp(7rem, 22vh, 13rem)
+    1fr
+    clamp(3rem, 8vh, 5rem);
+  gap: clamp(0.5rem, 1.5vw, 1.25rem) clamp(0.75rem, 2vw, 1.75rem);
+  isolation: isolate;
+}
+
+/* Grid lines that flash on briefly. Each line scales from 0 then fades. */
+.d18__grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  animation: d18-grid-flash 1100ms var(--ease-out) 0ms forwards;
+}
+
+.d18__grid-row,
+.d18__grid-col {
+  position: absolute;
+  background: var(--d18-line-strong);
+}
+
+.d18__grid-row {
+  left: 0;
+  right: 0;
+  height: 1px;
+  top: calc(20% * var(--row));
+  transform-origin: left center;
+  transform: scaleX(0);
+  animation: d18-grid-rule-x 600ms var(--ease-out) calc(60ms * var(--row)) forwards;
+}
+
+.d18__grid-col {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  left: calc(20% * var(--col));
+  transform-origin: top center;
+  transform: scaleY(0);
+  animation: d18-grid-rule-y 600ms var(--ease-out) calc(80ms * var(--col)) forwards;
+}
+
+@keyframes d18-grid-flash {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  70%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+@keyframes d18-grid-rule-x { to { transform: scaleX(1); } }
+@keyframes d18-grid-rule-y { to { transform: scaleY(1); } }
+
+/* Hero text + photo placements on the modular grid. */
+.d18__hero-tag {
+  grid-column: 1 / span 2;
+  grid-row: 1;
+  align-self: end;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d18-fg-muted);
+  z-index: 1;
+}
+
+.d18__h1 {
+  grid-column: 1 / span 4;
+  grid-row: 2 / span 2;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: clamp(4.5rem, 16vw, 14rem);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  align-self: center;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 clamp(0.6rem, 1.6vw, 1.4rem);
+  /* H1 owns its own composed transform so the per-word offsets nest cleanly. */
+  transform: none;
+}
+
+/* Each word sits at its own baseline. Override the utility's bare
+   translateY by composing with a per-word adjustment via a wrapper. */
+.d18__word {
+  display: inline-block;
+}
+.d18__word--clark {
+  color: var(--d18-fg);
+}
+.d18__word--kevin {
+  color: var(--d18-fg);
+}
+
+.d18__hero-rivers {
+  grid-column: 1 / span 2;
+  grid-row: 4;
+  align-self: start;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d18-fg-dim);
+  z-index: 1;
+}
+
+.d18__hero-role {
+  grid-column: 3 / span 2;
+  grid-row: 4;
+  align-self: start;
+  justify-self: end;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d18-fg-muted);
+  z-index: 1;
+}
+
+.d18__hero-photo {
+  grid-column: 4;
+  grid-row: 1 / span 4;
+  align-self: center;
+  justify-self: end;
+  width: min(28vw, 22rem);
+  aspect-ratio: 3 / 4;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--d18-line-strong);
+  z-index: 1;
+}
+.d18__hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.18) contrast(1.04);
+}
+
+/* Stage 2: words drop in from way-off-screen to their final off-baseline
+   position. We use clip-path + a large initial translate so the motion
+   reads as a sleek drop, not a slide. */
+@media (prefers-reduced-motion: no-preference) {
+  .d18 [data-stage="2"] {
+    opacity: 0;
+    transform: translateY(-120%);
+    animation: d18-drop 900ms var(--ease-out) 300ms forwards;
+  }
+  .d18__word--clark[data-stage="2"] {
+    animation-delay: 420ms;
+  }
+  .d18__hero-tag[data-stage="2"]    { animation-delay: 320ms; }
+  .d18__hero-rivers[data-stage="2"] { animation-delay: 540ms; }
+  .d18__hero-role[data-stage="2"]   { animation-delay: 580ms; }
+
+  .d18 [data-stage="4"] {
+    opacity: 0;
+    transform: translateY(2.5rem) scale(0.985);
+    animation: d18-settle 700ms var(--ease-out) 1100ms forwards;
+  }
+}
+
+/* Each keyframe lands the element on its final off-baseline position by
+   reading the appropriate offset variable. */
+@keyframes d18-drop {
+  0%   { opacity: 0; transform: translateY(-120%); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes d18-settle {
+  0%   { opacity: 0; transform: translateY(2.5rem) scale(0.985); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* The hero word offsets need to survive the stage-2 animation. We let the
+   animation land the elements; the per-word translateY utility then applies
+   normally because the animation's `to` state has `transform: translateY(0)`
+   and the `d18__off--*` classes win as the rule with higher specificity for
+   the static state. To make this work without flicker, we let the animation
+   set transform during its run, and then `animation-fill-mode: forwards`
+   keeps the final transform. We override the final transform per element so
+   it lands on the off-baseline value: */
+.d18__word--kevin[data-stage="2"] {
+  animation-name: d18-drop-kevin;
+}
+.d18__word--clark[data-stage="2"] {
+  animation-name: d18-drop-clark;
+}
+.d18__hero-tag[data-stage="2"] {
+  animation-name: d18-drop-up-lg;
+}
+.d18__hero-rivers[data-stage="2"] {
+  animation-name: d18-drop-down-lg;
+}
+.d18__hero-role[data-stage="2"] {
+  animation-name: d18-drop-up-sm;
+}
+
+@keyframes d18-drop-kevin {
+  0%   { opacity: 0; transform: translateY(-120%); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0.18em); }
+}
+@keyframes d18-drop-clark {
+  0%   { opacity: 0; transform: translateY(-120%); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(-0.12em); }
+}
+@keyframes d18-drop-up-lg {
+  0%   { opacity: 0; transform: translateY(-120%); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(-0.45em); }
+}
+@keyframes d18-drop-down-sm {
+  0%   { opacity: 0; transform: translateY(-120%); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0.18em); }
+}
+@keyframes d18-drop-up-sm {
+  0%   { opacity: 0; transform: translateY(-120%); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(-0.12em); }
+}
+@keyframes d18-drop-down-lg {
+  0%   { opacity: 0; transform: translateY(-120%); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0.42em); }
+}
+
+/* ----------------------------------------------------------------------------
+   SHARED SECTION SHELL
+   --------------------------------------------------------------------------*/
+
+.d18__section {
+  padding: clamp(3rem, 8vw, 7rem) clamp(2rem, 6vw, 5rem);
+  border-top: 1px solid var(--d18-line);
+}
+
+.d18__section-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: clamp(1rem, 3vw, 3rem);
+  padding-bottom: clamp(2rem, 5vw, 4rem);
+  border-bottom: 1px solid var(--d18-line);
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+}
+
+.d18__section-num {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  color: var(--d18-fg-dim);
+}
+
+.d18__section-h {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.d18__section-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--d18-fg-muted);
+}
+
+/* ----------------------------------------------------------------------------
+   WORKS
+   --------------------------------------------------------------------------*/
+
+.d18__credits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+}
+
+.d18__credit {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1.6fr) minmax(0, 0.8fr) minmax(0, 1.3fr);
+  grid-template-rows: auto;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding: clamp(1.5rem, 3vw, 2.5rem) 0;
+  border-bottom: 1px solid var(--d18-line);
+}
+
+.d18__credit-index {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  color: var(--d18-fg-dim);
+}
+
+.d18__credit-brand {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+}
+
+.d18__credit-role {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d18-fg-muted);
+}
+
+.d18__credit-photo {
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  justify-self: end;
+  max-width: 22rem;
+  border: 1px solid var(--d18-line-strong);
+}
+.d18__credit-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.15) contrast(1.04);
+}
+
+.d18__credit-note {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--d18-fg-muted);
+  justify-self: end;
+  max-width: 22rem;
+  text-align: right;
+}
+
+.d18__credit-rule {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background: var(--d18-line-strong);
+  justify-self: end;
+  max-width: 22rem;
+}
+
+/* ----------------------------------------------------------------------------
+   VIDEO — landscape 16:9 poster with CSS play overlay
+   --------------------------------------------------------------------------*/
+
+.d18__video-frame {
+  margin: 0 auto;
+  max-width: 64rem;
+}
+
+.d18__video-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--bg-elev);
+  border: 1px solid var(--d18-line-strong);
+  overflow: hidden;
+}
+
+.d18__video-el {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.18) contrast(1.05);
+}
+
+/* CSS play overlay — sits dead-center, breathes subtly. */
+.d18__video-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.d18__video-play::before {
+  content: '';
+  width: clamp(4.5rem, 8vw, 6.5rem);
+  height: clamp(4.5rem, 8vw, 6.5rem);
+  border-radius: 999px;
+  border: 1px solid rgba(245, 241, 234, 0.7);
+  background: rgba(10, 10, 10, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.d18__video-play-glyph {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0.7rem 0 0.7rem 1.1rem;
+  border-color: transparent transparent transparent rgba(245, 241, 234, 0.92);
+  transform: translateX(0.18rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .d18__video-play::before {
+    animation: d18-pulse 3200ms var(--ease-in-out) infinite;
+  }
+}
+
+@keyframes d18-pulse {
+  0%, 100% { transform: scale(1);   opacity: 0.9; }
+  50%      { transform: scale(1.06); opacity: 1;  }
+}
+
+.d18__video-caption {
+  margin-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d18-fg-muted);
+}
+
+/* ----------------------------------------------------------------------------
+   INFO
+   --------------------------------------------------------------------------*/
+
+.d18__info-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  grid-template-rows: auto auto;
+  gap: clamp(2rem, 4vw, 4rem) clamp(2rem, 5vw, 5rem);
+  align-items: start;
+}
+
+.d18__bio {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  line-height: 1.45;
+  color: var(--d18-fg);
+  max-width: 38rem;
+}
+
+.d18__info-photo {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--d18-line-strong);
+}
+.d18__info-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.18) contrast(1.04);
+}
+
+.d18__facts {
+  grid-column: 1;
+  grid-row: 2;
+  margin: 0;
+  display: grid;
+  gap: 1.25rem;
+}
+.d18__fact {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  padding-top: 1rem;
+  border-top: 1px solid var(--d18-line);
+}
+.d18__fact dt {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--d18-fg-dim);
+  margin: 0;
+}
+.d18__fact dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: var(--d18-fg);
+}
+
+.d18__rep {
+  grid-column: 1 / span 2;
+  grid-row: 3;
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+  padding-top: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid var(--d18-line);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1.4fr;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  align-items: baseline;
+}
+.d18__rep-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--d18-fg-dim);
+}
+.d18__rep-agency {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: clamp(1.3rem, 2.4vw, 1.85rem);
+  letter-spacing: -0.01em;
+}
+.d18__rep-phone {
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  letter-spacing: 0.08em;
+  color: var(--d18-fg);
+  border-bottom: 1px solid var(--d18-line-strong);
+  padding-bottom: 0.25rem;
+  width: fit-content;
+  transition: border-color 240ms var(--ease-out);
+}
+.d18__rep-phone:hover,
+.d18__rep-phone:focus-visible {
+  border-color: var(--accent);
+}
+.d18__rep-note {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--d18-fg-muted);
+  max-width: 22rem;
+}
+
+/* ----------------------------------------------------------------------------
+   FOOTER
+   --------------------------------------------------------------------------*/
+
+.d18__footer {
+  padding: clamp(3rem, 7vw, 6rem) clamp(2rem, 6vw, 5rem) clamp(3rem, 6vw, 5rem);
+  border-top: 1px solid var(--d18-line);
+}
+
+.d18__footer-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: clamp(1rem, 3vw, 3rem);
+  padding-bottom: clamp(2rem, 5vw, 4rem);
+  border-bottom: 1px solid var(--d18-line);
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+}
+
+.d18__footer-form {
+  max-width: 42rem;
+}
+
+.d18__footer-meta {
+  margin-top: clamp(2rem, 5vw, 4rem);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--d18-fg-dim);
+}
+
+/* ----------------------------------------------------------------------------
+   RESPONSIVE — keep the modular rhythm but stack at narrow widths.
+   --------------------------------------------------------------------------*/
+
+@media (max-width: 900px) {
+  .d18__hero {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows:
+      auto
+      auto
+      auto
+      auto
+      auto;
+    min-height: auto;
+    padding-top: clamp(3rem, 10vw, 5rem);
+    padding-bottom: clamp(3rem, 10vw, 5rem);
+  }
+  .d18__hero-tag    { grid-column: 1 / -1; grid-row: 1; }
+  .d18__h1          { grid-column: 1 / -1; grid-row: 2; }
+  .d18__hero-photo  { grid-column: 1 / -1; grid-row: 3; width: 100%; max-width: 22rem; justify-self: start; }
+  .d18__hero-rivers { grid-column: 1; grid-row: 4; }
+  .d18__hero-role   { grid-column: 2; grid-row: 4; justify-self: end; }
+
+  .d18__credit {
+    grid-template-columns: 3rem 1fr;
+    row-gap: 0.5rem;
+  }
+  .d18__credit-index { grid-column: 1; grid-row: 1; }
+  .d18__credit-brand { grid-column: 2; grid-row: 1; }
+  .d18__credit-role  { grid-column: 2; grid-row: 2; }
+  .d18__credit-photo,
+  .d18__credit-note,
+  .d18__credit-rule  { grid-column: 1 / -1; grid-row: 3; justify-self: start; max-width: 100%; }
+
+  .d18__info-grid {
+    grid-template-columns: 1fr;
+  }
+  .d18__info-photo { grid-column: 1; grid-row: 2; aspect-ratio: 4 / 5; max-width: 24rem; }
+  .d18__facts      { grid-row: 3; }
+  .d18__rep        { grid-row: 4; grid-template-columns: 1fr; }
+}
+
+/* Reduced-motion: the grid never flashes; words land directly. */
+@media (prefers-reduced-motion: reduce) {
+  .d18__grid-lines,
+  .d18__grid-row,
+  .d18__grid-col {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+  .d18 [data-stage="2"],
+  .d18 [data-stage="4"] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  .d18__video-play::before {
+    animation: none !important;
+  }
+}

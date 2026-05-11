@@ -1,0 +1,139 @@
+/* --------------------------------------------------------------------------
+   Kevin Clark — global tokens + reset
+   Designs override locally as needed via design-scoped class names.
+   -------------------------------------------------------------------------- */
+
+:root {
+  --bg: #0a0a0a;
+  --bg-elev: #141414;
+  --fg: #f5f1ea;
+  --fg-muted: #a8a29b;
+  --fg-dim: #6b6660;
+  --accent: #e9e2d4;
+  --line: rgba(245, 241, 234, 0.12);
+  --line-strong: rgba(245, 241, 234, 0.32);
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Fraunces', 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --maxw: 1440px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+img, picture, video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+input, textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+::selection { background: var(--accent); color: var(--bg); }
+
+/* Shared utility: the loud "Kevin Clark" entrance H1.
+   Each design picks its own typography + entrance — these are just baseline
+   reset rules so the H1 fills its container by default. */
+.kc-h1 {
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+
+/* "Wrapped" mode: letters live inside .kc-word groups (one per word) so the
+   browser can break "Kevin Clark" between words but never mid-word. .kc-word
+   is a standalone utility (works inside an h1 OR a decorative div). Designs
+   can target .kc-word > span for per-letter staggers. */
+.kc-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.kc-h1[data-mode="letters"] .kc-word > span {
+  display: inline-block;
+}
+
+/* Bottom-right switcher base styles. Designs may override colors via
+   --switcher-bg / --switcher-fg on the root design container. */
+.kc-switcher {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  background: var(--switcher-bg, rgba(10, 10, 10, 0.78));
+  color: var(--switcher-fg, var(--fg));
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.kc-switcher__btn {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  transition: background 220ms var(--ease-out);
+}
+
+.kc-switcher__btn:hover {
+  background: rgba(245, 241, 234, 0.12);
+}
+
+.kc-switcher__count {
+  min-width: 3.25rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reduced motion respect — designs may layer further. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

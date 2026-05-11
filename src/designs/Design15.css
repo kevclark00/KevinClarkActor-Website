@@ -1,0 +1,723 @@
+/* ==========================================================================
+   Design 15 — Vertical Reading
+   Angle: sideways type as a structural rail. The page scrolls top-to-bottom
+   like any Western page, but vertical labels on the left/right edges give
+   the reading direction a vertical accent — a Japanese book cover idea
+   translated into a Western actor's site.
+
+   Restraint: hairline rules, mono caps for vertical labels, Fraunces for
+   the horizontal body, abstract + minimalist throughout. No photo repeats.
+   ========================================================================== */
+
+.d15 {
+  --bg: #0e0d0b;
+  --paper: #14130f;
+  --fg: #efe9dc;
+  --fg-soft: rgba(239, 233, 220, 0.62);
+  --fg-faint: rgba(239, 233, 220, 0.32);
+  --line: rgba(239, 233, 220, 0.16);
+  --line-soft: rgba(239, 233, 220, 0.08);
+  --line-strong: rgba(239, 233, 220, 0.34);
+
+  --rail-w: clamp(2.25rem, 4.5vw, 3.25rem);
+  --gutter: clamp(1.25rem, 3vw, 2.25rem);
+
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100dvh;
+  position: relative;
+
+  display: grid;
+  grid-template-columns: var(--rail-w) 1fr var(--rail-w);
+
+  --switcher-bg: rgba(14, 13, 11, 0.88);
+  --switcher-fg: var(--fg);
+
+  font-family: var(--font-serif);
+  font-feature-settings: 'liga', 'kern', 'onum';
+}
+
+/* ---------------------------------------------------------------- RAILS */
+
+.d15__rail {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  border-color: var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(1.25rem, 3vw, 2rem) 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.d15__rail--left  { border-right: 1px solid var(--line); }
+.d15__rail--right { border-left:  1px solid var(--line); }
+
+.d15__rail-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  flex: 1;
+  justify-content: center;
+}
+
+/* All vertical labels share the same writing-mode trick.
+   Using writing-mode: vertical-rl + rotate(180deg) reads top-to-bottom
+   on the left rail. */
+.d15__rail-label,
+.d15__rail-mark,
+.d15__edge-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  white-space: nowrap;
+}
+
+.d15__rail-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65em;
+  opacity: 0;
+  transform: rotate(180deg) translateY(0.4em);
+  animation: d15-rail-rise 1100ms var(--ease-out) forwards;
+  animation-delay: calc(80ms * var(--rail-i, 0));
+}
+
+.d15__rail-numeral {
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+
+.d15__rail-dot {
+  color: var(--fg-faint);
+  letter-spacing: 0;
+}
+
+.d15__rail-text {
+  color: var(--fg-soft);
+}
+
+.d15__rail-mark {
+  opacity: 0;
+  animation: d15-rail-rise 1300ms var(--ease-out) 600ms forwards;
+}
+
+.d15__rail-mark--bottom { color: var(--fg-faint); }
+
+/* -------------------------------------------------------------- COLUMN */
+
+.d15__col {
+  grid-column: 2;
+  padding:
+    clamp(3.5rem, 8vw, 7rem)
+    var(--gutter)
+    clamp(3rem, 6vw, 5rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5rem, 12vw, 9rem);
+  max-width: 100%;
+}
+
+/* =========================================================== HERO */
+
+.d15__hero {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: "edge main photo";
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: stretch;
+}
+
+@media (max-width: 880px) {
+  .d15__hero {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "photo"
+      "edge";
+  }
+}
+
+.d15__hero-edge {
+  grid-area: edge;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 0.5rem;
+}
+
+@media (max-width: 880px) {
+  .d15__hero-edge { flex-direction: row; padding: 0.5rem 0 0; }
+}
+
+.d15__edge-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.38em;
+  color: var(--fg);
+  opacity: 0;
+  transform: rotate(180deg) translateY(0.4em);
+  animation: d15-rail-rise 1100ms var(--ease-out) forwards;
+  animation-delay: calc(80ms * var(--rail-i, 0));
+}
+
+.d15__edge-label--alt {
+  color: var(--fg-soft);
+  font-size: 0.6rem;
+}
+
+.d15__hero-main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  justify-content: flex-start;
+  padding-top: clamp(0.5rem, 1.5vw, 1.5rem);
+}
+
+.d15__hero-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 0.75rem;
+}
+
+.d15__meta-item {
+  opacity: 0;
+  transform: translateY(0.4em);
+  animation: d15-rise 900ms var(--ease-out) forwards;
+  animation-delay: calc(80ms * var(--rail-i, 0));
+}
+
+/* Stage 2 — horizontal divider grows */
+.d15__divider {
+  height: 1px;
+  background: var(--fg);
+  opacity: 0.55;
+  transform: scaleX(0);
+  transform-origin: left center;
+  animation: d15-grow-x 1400ms var(--ease-out) 400ms forwards;
+}
+
+/* Stage 3 — h1 fades */
+.d15__h1 {
+  font-family: var(--font-serif);
+  font-weight: 340;
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.018em;
+  margin: 0;
+  color: var(--fg);
+  opacity: 0;
+  transform: translateY(0.25em);
+  animation: d15-rise 1300ms var(--ease-out) 600ms forwards;
+}
+
+/* Stage 5 — supporting line fades */
+.d15__hero-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 350;
+  font-size: clamp(1rem, 1.45vw, 1.2rem);
+  line-height: 1.55;
+  margin: 0;
+  max-width: 38ch;
+  color: var(--fg-soft);
+  opacity: 0;
+  animation: d15-fade 1200ms var(--ease-out) 1200ms forwards;
+}
+
+/* Stage 4 — photo lands */
+.d15__hero-photo {
+  grid-area: photo;
+  margin: 0;
+  width: clamp(11rem, 28vw, 22rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  opacity: 0;
+  transform: translateY(0.35rem);
+  animation: d15-rise 1500ms var(--ease-out) 900ms forwards;
+}
+
+@media (max-width: 880px) {
+  .d15__hero-photo { width: 100%; }
+}
+
+.d15__hero-photo img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  background: #1a1714;
+  filter: grayscale(0.16) contrast(1.02);
+}
+
+.d15__hero-caption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.d15__hero-caption-num {
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================ SECTIONS */
+
+.d15__sec-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  border-top: 1px solid var(--line);
+  padding-top: clamp(1.5rem, 3vw, 2.25rem);
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.d15__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  margin: 0;
+}
+
+.d15__sec-title {
+  font-family: var(--font-serif);
+  font-weight: 340;
+  font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  margin: 0;
+  color: var(--fg);
+}
+
+.d15__sec-title em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* =============================================================== WORKS */
+
+.d15__credits {
+  list-style: none;
+  margin: 0 0 clamp(1.5rem, 3vw, 2.25rem);
+  padding: 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.d15__credit {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1rem 1.5rem;
+  align-items: baseline;
+  padding: clamp(0.95rem, 1.8vw, 1.25rem) 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.d15__credit-no {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  color: var(--fg-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.d15__credit-brand {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.2rem, 2.1vw, 1.55rem);
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+.d15__credit-role {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  text-align: right;
+}
+
+.d15__works-plate {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.d15__works-plate img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background: #1a1714;
+  filter: grayscale(0.16) contrast(1.02);
+}
+
+.d15__works-plate figcaption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+/* ================================================================= REEL */
+
+.d15__reel {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.d15__reel-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #14130f;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.d15__reel-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.2) contrast(1.02) brightness(0.9);
+}
+
+.d15__reel-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: clamp(3rem, 6vw, 4.5rem);
+  height: clamp(3rem, 6vw, 4.5rem);
+  border: 1px solid var(--fg);
+  border-radius: 999px;
+  background: rgba(14, 13, 11, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+  transition:
+    background 240ms var(--ease-out),
+    transform 240ms var(--ease-out);
+}
+
+.d15__reel-play:hover {
+  background: rgba(14, 13, 11, 0.8);
+  transform: scale(1.04);
+}
+
+.d15__reel-play-triangle {
+  width: 0;
+  height: 0;
+  margin-left: 0.25em;
+  border-style: solid;
+  border-width: 0.55em 0 0.55em 0.9em;
+  border-color: transparent transparent transparent var(--fg);
+}
+
+.d15__reel-cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.d15__reel-cap-meta { color: var(--fg-faint); }
+
+/* ================================================================ INFO */
+
+.d15__tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--fg);
+  margin: 0 0 clamp(1.25rem, 2.5vw, 1.75rem);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.d15__info-grid {
+  display: grid;
+  grid-template-columns: 1fr clamp(10rem, 26vw, 18rem);
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  align-items: start;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+@media (max-width: 720px) {
+  .d15__info-grid { grid-template-columns: 1fr; }
+}
+
+.d15__bio {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 350;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.65;
+  margin: 0;
+  max-width: 42ch;
+  color: var(--fg);
+}
+
+.d15__info-plate { margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+
+.d15__info-plate img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  background: #1a1714;
+  filter: grayscale(0.16) contrast(1.02);
+}
+
+.d15__info-plate figcaption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.d15__edu {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 0.5rem 1.25rem;
+  margin: 0 0 clamp(1.5rem, 3vw, 2.25rem);
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+@media (max-width: 720px) {
+  .d15__edu { grid-template-columns: 1fr; }
+}
+
+.d15__edu dt {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+  padding-top: 0.25em;
+}
+
+.d15__edu dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+/* Representation — quiet but unmissable */
+
+.d15__rep {
+  margin: 0;
+  padding: clamp(1.5rem, 3vw, 2rem) clamp(1.25rem, 2.5vw, 1.75rem);
+  border-top: 1px solid var(--fg);
+  border-bottom: 1px solid var(--fg);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.d15__rep-eyebrow { margin: 0; }
+
+.d15__rep-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.d15__rep-row {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  align-items: baseline;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 0.75rem;
+}
+
+.d15__rep-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.d15__rep-row dt {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.d15__rep-row dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.2rem, 1.9vw, 1.5rem);
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+.d15__phone {
+  border-bottom: 1px solid var(--fg-faint);
+  padding-bottom: 0.08em;
+  transition: border-color 220ms var(--ease-out);
+}
+
+.d15__phone:hover { border-bottom-color: var(--fg); }
+
+.d15__rep-note {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 350;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--fg-soft);
+}
+
+/* ============================================================== FOOTER */
+
+.d15__footer {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  border-top: 1px solid var(--line);
+  padding-top: clamp(2rem, 4vw, 3rem);
+}
+
+.d15__footer-grid {
+  display: grid;
+  grid-template-columns: 1fr clamp(10rem, 24vw, 16rem);
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .d15__footer-grid { grid-template-columns: 1fr; }
+}
+
+.d15__footer-plate { margin: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+
+.d15__footer-plate img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background: #1a1714;
+  filter: grayscale(0.16) contrast(1.02);
+}
+
+.d15__footer-plate figcaption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-soft);
+}
+
+.d15__colophon {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--fg-faint);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ---------------------------------------------------- IntakeForm tune */
+
+.d15 .kc-form {
+  font-family: var(--font-serif);
+}
+
+.d15 .kc-form__submit {
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+/* ============================================================== MOTION */
+
+@keyframes d15-fade   { to { opacity: 1; } }
+@keyframes d15-rise   { to { opacity: 1; transform: translateY(0); } }
+@keyframes d15-grow-x { to { transform: scaleX(1); } }
+@keyframes d15-rail-rise {
+  to { opacity: 1; transform: rotate(180deg) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d15__rail-label,
+  .d15__rail-mark,
+  .d15__edge-label,
+  .d15__meta-item,
+  .d15__h1,
+  .d15__hero-sub,
+  .d15__hero-photo {
+    animation: none;
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+  /* Keep the vertical labels rotated; just don't animate them. */
+  .d15__rail-label,
+  .d15__rail-mark,
+  .d15__edge-label {
+    transform: rotate(180deg);
+  }
+  .d15__divider {
+    animation: none;
+    transform: scaleX(1);
+  }
+}

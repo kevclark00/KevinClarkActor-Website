@@ -1,0 +1,635 @@
+/* --------------------------------------------------------------------------
+   Design 09 — Mask Reveal · Serif Essay
+   The hero H1 is set in Fraunces; the actor photo emerges through the
+   letterforms via background-clip. The mask supports the typography rather
+   than the other way around. Body is a serif essay laid out in three
+   sections: Works, About, Representation.
+   -------------------------------------------------------------------------- */
+
+.d09 {
+  --bg: #0b0a08;
+  --fg: #f1ece1;
+  --fg-muted: #b9b1a2;
+  --fg-dim: #7a7367;
+  --rule: rgba(241, 236, 225, 0.16);
+  --rule-strong: rgba(241, 236, 225, 0.34);
+  --gold: #e5d9bf;
+
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-serif);
+}
+
+/* ---------- HERO ---------- */
+
+.d09__stage {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(2.5rem, 7vw, 6rem) clamp(1.25rem, 4vw, 3rem);
+}
+
+.d09__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.d09__bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.78) 70%),
+    linear-gradient(180deg, rgba(11, 10, 8, 0.55) 0%, rgba(11, 10, 8, 0.92) 100%);
+}
+
+.d09__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.45) contrast(1.05) brightness(0.92);
+  transform: scale(1.04);
+  opacity: 0;
+  animation:
+    d09-photo-in 1400ms var(--ease-out) 120ms forwards,
+    d09-ken 18s var(--ease-out) 120ms both;
+}
+
+@keyframes d09-photo-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes d09-ken {
+  from { transform: scale(1.14) translateY(-1%); }
+  to   { transform: scale(1.02) translateY(0); }
+}
+
+.d09__stage-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+.d09__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  opacity: 0;
+  animation: d09-fade-up 900ms var(--ease-out) 200ms forwards;
+}
+
+/* Serif H1 — Fraunces, with the actor photo masked through the letterforms.
+   The clip-path wipe reveals the type from left to right. */
+.d09__h1 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-style: italic;
+  font-size: clamp(3.2rem, 14vw, 14rem);
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+  color: transparent;
+}
+
+.d09__h1-text {
+  display: inline-block;
+  background-image:
+    linear-gradient(180deg, rgba(255, 250, 235, 0.92) 0%, rgba(229, 217, 191, 0.85) 60%, rgba(180, 165, 132, 0.78) 100%),
+    url('/photos/Actor%20in%20pittsburgh%20Kevin%20Clark.jpg');
+  background-size: cover, 140% auto;
+  background-position: center, center 30%;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay, normal;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 0.5px rgba(241, 236, 225, 0.18);
+  clip-path: inset(0 100% 0 0);
+  animation: d09-wipe 1500ms var(--ease-out) 500ms forwards;
+}
+
+@keyframes d09-wipe {
+  to { clip-path: inset(0 0 0 0); }
+}
+
+.d09__lede {
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  font-weight: 300;
+  line-height: 1.55;
+  letter-spacing: 0.005em;
+  margin: 0;
+  max-width: 44ch;
+  color: var(--fg);
+  opacity: 0;
+  animation: d09-fade-up 1100ms var(--ease-out) 1500ms forwards;
+}
+
+.d09__lede em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.d09__caption {
+  position: absolute;
+  bottom: clamp(1rem, 3vw, 2rem);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  opacity: 0;
+  animation: d09-fade-up 900ms var(--ease-out) 1800ms forwards;
+}
+
+@keyframes d09-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- SECTION SHELL ---------- */
+
+.d09__section {
+  position: relative;
+  padding: clamp(3.5rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3rem);
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+  border-top: 1px solid var(--rule);
+}
+
+.d09__section-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  column-gap: clamp(1rem, 3vw, 2rem);
+  row-gap: 0.5rem;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  padding-bottom: clamp(1rem, 2.5vw, 1.75rem);
+  border-bottom: 1px solid var(--rule);
+}
+
+.d09__section-num {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  color: var(--gold);
+  letter-spacing: 0.01em;
+}
+
+.d09__section-h {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-style: normal;
+  font-size: clamp(2.4rem, 7vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--fg);
+  font-variation-settings: 'opsz' 144, 'SOFT' 50;
+}
+
+/* Subtle mask-reveal on section headings — the gold gradient bleeds
+   through the serif letterforms; entrance is a clip wipe. */
+.d09__section-h-mask {
+  display: inline-block;
+  background:
+    linear-gradient(105deg, var(--fg) 0%, var(--fg) 55%, var(--gold) 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  clip-path: inset(0 100% 0 0);
+  animation: d09-wipe 1100ms var(--ease-out) both;
+  animation-timeline: view();
+  animation-range: entry 5% cover 30%;
+}
+
+.d09__section-tag {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  justify-self: end;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .d09__section-head {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'num h'
+      '.   tag';
+  }
+  .d09__section-num { grid-area: num; }
+  .d09__section-h { grid-area: h; }
+  .d09__section-tag { grid-area: tag; justify-self: start; }
+}
+
+/* ---------- WORKS ---------- */
+
+.d09__credits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+.d09__credit {
+  display: grid;
+  grid-template-columns: clamp(2.5rem, 4vw, 4rem) 1fr;
+  column-gap: clamp(1rem, 2.5vw, 2rem);
+  row-gap: 1.25rem;
+  align-items: start;
+  padding-bottom: clamp(2rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--rule);
+  opacity: 0;
+  animation: d09-fade-up 900ms var(--ease-out) both;
+  animation-delay: calc(120ms * var(--row, 0));
+  animation-timeline: view();
+  animation-range: entry 0% cover 25%;
+}
+
+.d09__credit:last-child { border-bottom: none; }
+
+.d09__credit-index {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  color: var(--gold);
+  letter-spacing: 0.02em;
+  padding-top: 0.4em;
+}
+
+.d09__credit-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.d09__credit-headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: clamp(0.75rem, 2vw, 1.5rem);
+  row-gap: 0.25rem;
+}
+
+.d09__credit-brand {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.5vw, 3.6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+  font-variation-settings: 'opsz' 144, 'SOFT' 40;
+}
+
+.d09__credit-role {
+  font-family: var(--font-serif);
+  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
+  color: var(--fg-muted);
+  letter-spacing: 0.01em;
+}
+
+.d09__credit-role em { font-style: italic; }
+
+.d09__credit-note {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.5;
+  color: var(--fg-muted);
+  margin: 0;
+  max-width: 52ch;
+}
+
+.d09__credit-photo {
+  grid-column: 1 / -1;
+  margin: 0.5rem 0 0;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: #000;
+  aspect-ratio: 16 / 9;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: d09-photo-pop 1100ms var(--ease-out) forwards;
+  animation-delay: calc(220ms + 140ms * var(--row, 0));
+  animation-timeline: view();
+  animation-range: entry 0% cover 30%;
+}
+
+.d09__credit-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.35) contrast(1.04);
+  transform: scale(1.02);
+  transition: transform 700ms var(--ease-out), filter 700ms var(--ease-out);
+}
+
+.d09__credit-photo:hover img {
+  transform: scale(1.06);
+  filter: grayscale(0) contrast(1.08);
+}
+
+@keyframes d09-photo-pop {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* StringTune iteration #3 — StringLazy adds a `-loaded` class to the img
+   once it has been loaded and is in view. Serif-quiet reveal: blur + scale
+   resolve as the image lands. The figure-level entrance still plays via
+   scroll-driven animation above; this is the image-level secondary reveal. */
+.d09__credit-photo--lazy img {
+  opacity: 0;
+  filter: blur(10px) grayscale(0.6);
+  transform: scale(1.06);
+  transition:
+    opacity 1000ms var(--ease-out),
+    filter 1200ms var(--ease-out),
+    transform 1200ms var(--ease-out);
+}
+.d09__credit-photo--lazy img.-loaded {
+  opacity: 1;
+  filter: grayscale(0.35) contrast(1.04);
+  transform: scale(1.02);
+}
+
+@media (min-width: 880px) {
+  .d09__credit-photo {
+    grid-column: 2;
+    max-width: 720px;
+  }
+}
+
+/* ---------- INFO ---------- */
+
+.d09__essay {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  max-width: 68ch;
+}
+
+.d09__bio {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  line-height: 1.45;
+  letter-spacing: 0.002em;
+  margin: 0;
+  color: var(--fg);
+}
+
+.d09__bio::first-letter {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 3.4em;
+  float: left;
+  line-height: 0.88;
+  padding-right: 0.12em;
+  padding-top: 0.06em;
+  color: var(--gold);
+}
+
+.d09__blurb {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.05rem, 1.4vw, 1.25rem);
+  line-height: 1.6;
+  margin: 0;
+  color: var(--fg-muted);
+  max-width: 58ch;
+}
+
+.d09__facts {
+  margin: 1rem 0 0;
+  padding: clamp(1rem, 2vw, 1.5rem) 0 0;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.d09__fact {
+  display: grid;
+  grid-template-columns: clamp(7rem, 22%, 11rem) 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.d09__fact:last-child { border-bottom: none; }
+
+.d09__fact dt {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.d09__fact dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  font-weight: 400;
+  color: var(--fg);
+  line-height: 1.4;
+}
+
+/* ---------- REPRESENTATION ---------- */
+
+.d09__rep-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.d09__rep-agency {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--fg);
+  font-variation-settings: 'opsz' 144;
+}
+
+.d09__rep-phone {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--gold);
+  border-bottom: 1px solid var(--rule-strong);
+  padding-bottom: 0.15em;
+  transition: color 240ms var(--ease-out), border-color 240ms var(--ease-out);
+  font-variation-settings: 'opsz' 144, 'SOFT' 50;
+}
+
+.d09__rep-phone:hover {
+  color: var(--fg);
+  border-bottom-color: var(--gold);
+}
+
+.d09__rep-close {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.5;
+  margin: 0;
+  color: var(--fg-muted);
+  max-width: 40ch;
+}
+
+/* ---------- FOOTER ---------- */
+
+.d09__footer {
+  border-top: 1px solid var(--rule);
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1.25rem, 4vw, 3rem);
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ---------- VIDEO ---------- */
+
+/* Quiet landscape player. The <video> has no src yet — its poster image
+   carries the frame, and a CSS play overlay sits on top. When Kevin
+   provides the reel, drop the src in the JSX and remove the overlay. */
+.d09__video-frame {
+  margin: 0;
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  max-width: 1080px;
+}
+
+.d09__video-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--rule);
+  background: #000;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.d09__video-el {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.35) contrast(1.04);
+  display: block;
+}
+
+.d09__video-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, 0) 35%, rgba(0, 0, 0, 0.55) 100%),
+    linear-gradient(180deg, rgba(11, 10, 8, 0) 60%, rgba(11, 10, 8, 0.5) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.d09__video-play {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.d09__video-play-glyph {
+  width: clamp(3.5rem, 6vw, 5.5rem);
+  height: clamp(3.5rem, 6vw, 5.5rem);
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: rgba(11, 10, 8, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  position: relative;
+}
+
+.d09__video-play-glyph::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0.7em 0 0.7em 1.05em;
+  border-color: transparent transparent transparent var(--gold);
+}
+
+.d09__video-caption {
+  font-family: var(--font-serif);
+  font-style: normal;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  letter-spacing: 0.02em;
+  color: var(--fg-muted);
+  margin: 0;
+}
+
+.d09__video-caption em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+/* ---------- REDUCED MOTION ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .d09__bg img { animation: none; opacity: 1; transform: none; }
+  .d09__h1-text { animation: none; clip-path: inset(0 0 0 0); }
+  .d09__section-h-mask { animation: none; clip-path: inset(0 0 0 0); }
+  .d09__eyebrow,
+  .d09__lede,
+  .d09__caption,
+  .d09__credit,
+  .d09__credit-photo {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

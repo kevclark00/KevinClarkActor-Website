@@ -1,0 +1,639 @@
+/* Design 08 — Vertical Spine */
+.d08 {
+  --bg: #0a0a0a;
+  --fg: #f5f1ea;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  position: relative;
+}
+
+.d08__rail {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  border-right: 1px solid var(--line);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(1rem, 2vw, 1.5rem) 0;
+  align-items: center;
+  width: clamp(72px, 8vw, 110px);
+  background: var(--bg);
+  z-index: 2;
+}
+
+.d08__mark {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin: 0 auto;
+  color: rgba(245, 241, 234, 0.55);
+}
+
+/* H1 spine — per-letter entrance from below using clip-path reveal */
+.d08__h1 {
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(2.5rem, 8vw, 8rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-orientation: mixed;
+  text-align: center;
+  justify-self: center;
+}
+
+.d08__h1 .kc-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.d08__h1 .kc-word > span {
+  display: inline-block;
+  /* In vertical-rl + rotate(180deg), animating translateY drifts the letter
+     along its column. clip-path narrows then opens vertically. */
+  opacity: 0;
+  transform: translateY(0.55em);
+  clip-path: inset(100% 0 0 0);
+  animation: d08-letter-rise 900ms var(--ease-out) both;
+  animation-delay: calc(120ms + var(--i, 0) * 70ms);
+}
+
+.d08__h1-gap {
+  display: inline-block;
+  height: 0.4em;
+}
+
+@keyframes d08-letter-rise {
+  0%   { opacity: 0; transform: translateY(0.55em); clip-path: inset(100% 0 0 0); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0 0); }
+}
+
+.d08__index {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--fg);
+}
+
+.d08__content {
+  padding: clamp(1.5rem, 4vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  min-width: 0;
+}
+
+/* ---------- HERO ---------- */
+.d08__hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .d08__hero { grid-template-columns: 2fr 1fr; }
+}
+
+.d08__photo {
+  aspect-ratio: 4 / 5;
+  background: #1a1a1a;
+  overflow: hidden;
+  position: relative;
+  margin: 0;
+}
+
+.d08__photo-img {
+  width: 100%;
+  height: 110%;
+  object-fit: cover;
+  filter: grayscale(0.15);
+  transform: translateY(-5%);
+  animation: d08-photo-drift 18s var(--ease-in-out) 200ms both;
+}
+
+@keyframes d08-photo-drift {
+  0%   { transform: translateY(-5%); }
+  50%  { transform: translateY(-1%); }
+  100% { transform: translateY(-4%); }
+}
+
+/* Sliding horizontal "KEVIN CLARK" overlay — crosses the photo at ~1.2s */
+.d08__photo-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1.6em;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(-50%);
+  /* Two-tone band: thin lines top/bottom, type centered. */
+  border-top: 1px solid rgba(245, 241, 234, 0.4);
+  border-bottom: 1px solid rgba(245, 241, 234, 0.4);
+  background: rgba(10, 10, 10, 0.42);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  animation: d08-sweep-fade 1400ms var(--ease-out) 900ms both;
+}
+
+.d08__photo-sweep > span {
+  display: inline-block;
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(0.85rem, 1.4vw, 1.15rem);
+  letter-spacing: 0.32em;
+  line-height: 1.6em;
+  color: var(--fg);
+  padding-left: 100%;
+  animation: d08-sweep-slide 14s linear 900ms infinite;
+}
+
+@keyframes d08-sweep-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes d08-sweep-slide {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+
+.d08__lede {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  line-height: 1.35;
+  letter-spacing: 0;
+  max-width: 30ch;
+  color: rgba(245, 241, 234, 0.85);
+  margin: 0;
+  opacity: 0;
+  animation: d08-lede-in 900ms var(--ease-out) 700ms both;
+}
+
+@keyframes d08-lede-in {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- META ROW ---------- */
+.d08__meta-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 234, 0.55);
+}
+
+.d08__meta-row b {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 1rem;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 0.25rem;
+  color: var(--fg);
+}
+
+@media (max-width: 700px) {
+  .d08__meta-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* ---------- SHARED SPINE SECTIONS ---------- */
+.d08__section {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  border-top: 1px solid var(--line);
+  padding-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.d08__section-rail {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: clamp(48px, 5vw, 72px);
+  padding-top: 0.25rem;
+}
+
+.d08__rail-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 234, 0.55);
+  white-space: nowrap;
+}
+
+.d08__section-body {
+  min-width: 0;
+}
+
+.d08__section-h {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: clamp(0.78rem, 1vw, 0.9rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 234, 0.7);
+  margin: 0 0 clamp(1.25rem, 2.5vw, 2rem);
+}
+
+/* ---------- WORKS ---------- */
+.d08__credits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.d08__credit {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  align-items: start;
+  padding: clamp(1.1rem, 2vw, 1.6rem) 0;
+  border-top: 1px solid var(--line);
+  position: relative;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  animation: d08-row-in 700ms var(--ease-out) both;
+  animation-delay: calc(180ms + var(--row, 0) * 120ms);
+}
+
+.d08__credit:first-child { border-top: none; padding-top: 0; }
+
+@keyframes d08-row-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.d08__credit-index {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 234, 0.55);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  align-self: stretch;
+  padding-block: 0.15rem;
+}
+
+.d08__credit-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.d08__credit-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.d08__credit-brand {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: clamp(1.35rem, 2.6vw, 2.1rem);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.d08__credit-rule {
+  flex: 1 1 2rem;
+  min-width: 2rem;
+  height: 1px;
+  background: var(--line);
+  align-self: center;
+}
+
+.d08__credit-role {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 234, 0.65);
+}
+
+.d08__credit-detail {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  line-height: 1.45;
+  color: rgba(245, 241, 234, 0.7);
+  max-width: 52ch;
+}
+
+.d08__credit-photo {
+  grid-column: 2;
+  margin: 1rem 0 0;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #1a1a1a;
+  opacity: 0;
+  transform: translateY(0.75rem);
+  animation: d08-row-in 800ms var(--ease-out) both;
+  animation-delay: calc(420ms + var(--row, 0) * 140ms);
+  max-width: 720px;
+}
+
+.d08__credit-photo[data-shape="portrait"] {
+  aspect-ratio: 4 / 5;
+  max-width: 380px;
+}
+
+.d08__credit-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.2);
+}
+
+/* ---------- REEL ---------- */
+.d08__reel-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 960px;
+}
+
+.d08__reel-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #1a1a1a;
+  border: 1px solid var(--line);
+  /* Sweep-in cut: mirror the hero band motion. */
+  clip-path: inset(0 0 0 0);
+  opacity: 0;
+  animation: d08-reel-cut 900ms var(--ease-out) 200ms both;
+}
+
+@keyframes d08-reel-cut {
+  0%   { opacity: 0; clip-path: inset(0 100% 0 0); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+.d08__reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.2) brightness(0.85);
+}
+
+/* Horizontal kicker band crossing the player — echoes the hero sweep. */
+.d08__reel-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18%;
+  height: 1.4em;
+  overflow: hidden;
+  pointer-events: none;
+  border-top: 1px solid rgba(245, 241, 234, 0.32);
+  border-bottom: 1px solid rgba(245, 241, 234, 0.32);
+  background: rgba(10, 10, 10, 0.5);
+  opacity: 0;
+  animation: d08-sweep-fade 1400ms var(--ease-out) 1200ms both;
+}
+
+.d08__reel-sweep > span {
+  display: inline-block;
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: clamp(0.7rem, 1.1vw, 0.95rem);
+  letter-spacing: 0.32em;
+  line-height: 1.4em;
+  color: var(--fg);
+  padding-left: 100%;
+  animation: d08-sweep-slide 18s linear 1200ms infinite;
+}
+
+.d08__reel-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: clamp(64px, 8vw, 96px);
+  height: clamp(64px, 8vw, 96px);
+  border: 1px solid rgba(245, 241, 234, 0.7);
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  cursor: not-allowed;
+  transition: background 240ms var(--ease-out), transform 240ms var(--ease-out);
+}
+
+.d08__reel-play[disabled] {
+  cursor: not-allowed;
+}
+
+.d08__reel-play-icon {
+  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+  color: var(--fg);
+  margin-left: 0.15em; /* visual centering of the triangle */
+}
+
+.d08__reel-cap {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 234, 0.55);
+}
+
+/* ---------- INFO ---------- */
+.d08__bio {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  line-height: 1.5;
+  margin: 0 0 1.75rem;
+  max-width: 38ch;
+  color: rgba(245, 241, 234, 0.92);
+}
+
+.d08__facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem 2rem;
+  margin: 0 0 1.75rem;
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+@media (min-width: 760px) {
+  .d08__facts { grid-template-columns: repeat(3, 1fr); }
+}
+
+.d08__fact { margin: 0; }
+
+.d08__fact dt {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 234, 0.55);
+  margin-bottom: 0.35rem;
+}
+
+.d08__fact dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
+.d08__blurbs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  max-width: 52ch;
+}
+
+.d08__blurbs p {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: rgba(245, 241, 234, 0.78);
+}
+
+/* ---------- REP ---------- */
+.d08__rep .d08__section-h {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 3vw, 2.4rem);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--fg);
+  margin-bottom: 0.6rem;
+}
+
+.d08__rep-line {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0 0.8rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0.8rem;
+}
+
+.d08__rep-phone {
+  font-family: var(--font-mono);
+  font-size: clamp(1.1rem, 1.8vw, 1.45rem);
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  border-bottom: 1px solid transparent;
+  transition: border-color 220ms var(--ease-out);
+}
+
+.d08__rep-phone:hover,
+.d08__rep-phone:focus-visible {
+  border-bottom-color: var(--fg);
+  outline: none;
+}
+
+.d08__rep-close {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  color: rgba(245, 241, 234, 0.7);
+}
+
+/* ---------- FOOTER ---------- */
+.d08__footer {
+  border-top: 1px solid var(--line);
+  padding-top: 1.5rem;
+}
+
+/* ---------- REDUCED MOTION ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .d08__h1 .kc-word > span,
+  .d08__photo-img,
+  .d08__photo-sweep,
+  .d08__photo-sweep > span,
+  .d08__lede,
+  .d08__credit,
+  .d08__credit-photo,
+  .d08__reel-frame,
+  .d08__reel-sweep,
+  .d08__reel-sweep > span {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+  .d08__h1 { transform: rotate(180deg); }
+  .d08__mark { transform: rotate(180deg); }
+  .d08__rail-label { transform: rotate(180deg); }
+  .d08__credit-index { transform: rotate(180deg); }
+  .d08__photo-img { transform: translateY(-5%); }
+  .d08__photo-sweep { display: none; }
+  .d08__reel-sweep { display: none; }
+}
+
+/* ---------- MOBILE ---------- */
+@media (max-width: 640px) {
+  .d08__section {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .d08__section-rail {
+    width: auto;
+    justify-content: flex-start;
+  }
+  .d08__rail-label {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+  .d08__credit-index {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+  .d08__credit-photo {
+    grid-column: 1 / -1;
+  }
+}
