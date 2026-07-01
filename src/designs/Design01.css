@@ -46,6 +46,8 @@
   align-items: end;
   gap: clamp(1rem, 3vw, 3rem);
   flex: 1;
+  /* contains the photo while it zips in from off the left edge */
+  overflow: hidden;
 }
 
 @media (min-width: 900px) {
@@ -62,10 +64,24 @@
   line-height: 0.78;
   text-transform: uppercase;
   margin: 0;
-  word-break: break-word;
-  /* clip-path wipe + lift */
-  animation: d01-wipe 1100ms var(--ease-out) both;
-  animation-delay: 200ms;
+  /* chars are split into inline-blocks; nowrap stops any letter from breaking
+     to a new line mid-word (same guard the GSAP SplitText setups use). */
+  white-space: nowrap;
+}
+
+/* Each name on its own line. The line is a mask; its inner span rises up from
+   110% into view, lines staggered. nowrap keeps a line intact. */
+.d01__h1-line {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.d01__h1-inner {
+  display: inline-block;
+  will-change: transform;
+  animation: d01-rise 900ms var(--ease-out) both;
+  animation-delay: calc(200ms + var(--line) * 160ms);
 }
 
 .d01__photo {
@@ -74,8 +90,8 @@
   background: #1a1a1a;
   overflow: hidden;
   border: var(--rule);
-  animation: d01-photo-in 900ms var(--ease-out) both;
-  animation-delay: 450ms;
+  animation: d01-photo-reveal 1050ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 400ms;
 }
 
 .d01__photo img {
@@ -83,6 +99,9 @@
   height: 100%;
   object-fit: cover;
   filter: grayscale(0.2) contrast(1.05);
+  /* slow Ken Burns drift inside the unmasking frame */
+  animation: d01-photo-zoom 1900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 400ms;
 }
 
 .d01__meta {
@@ -122,27 +141,32 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes d01-wipe {
+@keyframes d01-rise {
   from {
-    opacity: 0;
-    transform: translateY(0.25em);
-    clip-path: inset(0 100% 0 0);
+    transform: translateY(110%);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Road Runner: photo streaks in from off the right with a speed-skew, blows
+   The frame unmasks top-to-bottom while the photo drifts in a slow zoom. */
+@keyframes d01-photo-reveal {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
     clip-path: inset(0 0 0 0);
   }
 }
 
-@keyframes d01-photo-in {
+@keyframes d01-photo-zoom {
   from {
-    opacity: 0;
-    transform: translateY(2rem) scale(0.94);
+    transform: scale(1.14);
   }
   to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: scale(1);
   }
 }
 
@@ -202,6 +226,12 @@
   display: block;
 }
 
+/* No rule above "Selected Works" — the credit list has its own top rule. */
+.d01__works .d01__section-head {
+  border-top: none;
+  padding-top: 0;
+}
+
 .d01__credits {
   list-style: none;
   margin: 0;
@@ -210,19 +240,75 @@
 }
 
 .d01__credit {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
   display: grid;
   grid-template-columns: 2.5rem 4.5rem 1fr auto auto;
   align-items: center;
   gap: clamp(0.75rem, 2vw, 1.5rem);
-  padding: clamp(0.75rem, 1.5vw, 1.25rem) 0.25rem;
+  padding: clamp(0.75rem, 1.5vw, 1.25rem) 0.5rem;
   border-bottom: var(--hairline);
   font-family: var(--font-mono);
   animation: d01-pop 700ms var(--ease-out) both;
   animation-delay: var(--pop-delay, 0ms);
+  transition: color 200ms var(--ease-out), border-color 200ms var(--ease-out);
+}
+
+/* The black itself: a bar that surges in from the left with an overshoot,
+   settling flush behind the row — the flamboyant part. */
+.d01__credit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--fg);
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 220ms cubic-bezier(0.3, 0.9, 0.25, 1);
 }
 
 .d01__credit:last-child {
   border-bottom: var(--rule);
+}
+
+/* Hover: text + borders flip to the light ground as the black bar arrives. */
+.d01__credit:hover {
+  color: var(--bg);
+  border-bottom-color: var(--bg);
+}
+
+.d01__credit:hover::before {
+  transform: scaleY(1);
+}
+
+.d01__credit:hover .d01__credit-brand {
+  transform: translateX(0.6rem);
+}
+
+.d01__credit:hover .d01__credit-idx,
+.d01__credit:hover .d01__credit-role,
+.d01__credit:hover .d01__credit-year {
+  color: var(--bg);
+}
+
+.d01__credit:hover .d01__credit-photo {
+  border-color: var(--bg);
+}
+
+.d01__credit:hover .d01__credit-placeholder {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.d01__credit-idx,
+.d01__credit-role,
+.d01__credit-year {
+  transition: color 260ms var(--ease-out);
+}
+
+.d01__credit-photo {
+  transition: border-color 260ms var(--ease-out);
 }
 
 .d01__credit-idx {
@@ -269,6 +355,7 @@
   letter-spacing: -0.02em;
   text-transform: uppercase;
   line-height: 1;
+  transition: transform 220ms cubic-bezier(0.3, 0.9, 0.25, 1);
 }
 
 .d01__credit-role {
@@ -310,6 +397,25 @@
 
 .d01__video {
   display: block;
+  padding-top: 5vh;
+}
+
+/* No rule above "Reel". */
+.d01__video .d01__section-head {
+  border-top: none;
+  padding-top: 0;
+}
+
+.d01__cuts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+}
+
+@media (min-width: 720px) {
+  .d01__cuts {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .d01__player {
@@ -401,6 +507,16 @@
   text-transform: uppercase;
   color: var(--fg);
   background: var(--bg);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.d01__player-year {
+  flex-shrink: 0;
+  color: var(--fg-soft);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 720px) {
@@ -423,6 +539,7 @@
 
 .d01__info {
   display: block;
+  padding-top: 5vh;
 }
 
 .d01__eyebrow {
@@ -460,7 +577,6 @@
 .d01__data {
   display: grid;
   grid-template-columns: 1fr;
-  border-top: var(--rule);
   margin: 0;
 }
 
@@ -483,6 +599,24 @@
 
 .d01__data dd {
   margin: 0;
+  text-transform: uppercase;
+}
+
+.d01__rep-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  align-self: start;
+}
+
+/* Big bold statement heading above the rep tile — hero-h1 treatment. */
+.d01__rep-lead {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
   text-transform: uppercase;
 }
 
@@ -551,10 +685,79 @@
    FOOTER
    ─────────────────────────────────────────────────────────── */
 
+/* Black footer, full-bleed out past the article's padding. Form tokens are
+   flipped to light so the fields read on the dark ground. */
 .d01__footer {
-  margin-top: clamp(2rem, 5vw, 5rem);
-  border-top: var(--rule);
-  padding-top: 1.5rem;
+  --rx: 0deg;
+  --ry: 0deg;
+  --fg: #f3efe7;
+  --fg-muted: rgba(243, 239, 231, 0.62);
+  --fg-dim: rgba(243, 239, 231, 0.34);
+  --line-strong: rgba(243, 239, 231, 0.4);
+  --accent: #f3efe7;
+  --bg: #060606;
+
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin: clamp(2.5rem, 6vw, 6rem)
+    calc(-1 * clamp(1rem, 2vw, 2rem))
+    calc(-1 * clamp(1rem, 2vw, 2rem));
+  padding: clamp(3rem, 9vw, 8rem) clamp(1.5rem, 6vw, 6rem) clamp(3rem, 8vw, 7rem);
+  background: #060606;
+  color: #f3efe7;
+}
+
+/* Deep-background wordmark, ghosted white, tilting in 3D toward the pointer. */
+.d01__footer-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 900px;
+  pointer-events: none;
+}
+
+.d01__footer-ghost {
+  max-width: 12ch;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-weight: 900;
+  font-size: clamp(3.5rem, 15vw, 15rem);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+  color: rgba(243, 239, 231, 0.07);
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 140ms linear;
+  will-change: transform;
+  animation: d01-footer-ghost 1400ms var(--ease-out) both;
+  animation-delay: 200ms;
+}
+
+@keyframes d01-footer-ghost {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.d01__footer-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  align-items: flex-start;
+}
+
+.d01__footer-kicker {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -564,6 +767,8 @@
 @media (prefers-reduced-motion: reduce) {
   .d01__topbar,
   .d01__h1,
+  .d01__h1-line,
+  .d01__h1-inner,
   .d01__photo,
   .d01__meta,
   .d01__credit {

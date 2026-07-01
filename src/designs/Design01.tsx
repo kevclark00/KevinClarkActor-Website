@@ -1,5 +1,63 @@
+import { useEffect, useRef } from 'react';
 import { IntakeForm } from '../components/IntakeForm';
 import './Design01.css';
+
+// Footer with a huge white "Taking on roles!" wordmark ghosted in the deep
+// background that tilts in 3D toward the pointer — the form fields ride on top.
+function FooterReel() {
+  const stageRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let raf = 0;
+    let tx = 0;
+    let ty = 0;
+    let cx = 0;
+    let cy = 0;
+
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      tx = (e.clientX - r.left) / r.width - 0.5;
+      ty = (e.clientY - r.top) / r.height - 0.5;
+    };
+    const onLeave = () => {
+      tx = 0;
+      ty = 0;
+    };
+
+    const tick = () => {
+      cx += (tx - cx) * 0.06;
+      cy += (ty - cy) * 0.06;
+      el.style.setProperty('--ry', `${(cx * 34).toFixed(2)}deg`);
+      el.style.setProperty('--rx', `${(-cy * 24).toFixed(2)}deg`);
+      raf = requestAnimationFrame(tick);
+    };
+
+    el.addEventListener('mousemove', onMove);
+    el.addEventListener('mouseleave', onLeave);
+    raf = requestAnimationFrame(tick);
+    return () => {
+      el.removeEventListener('mousemove', onMove);
+      el.removeEventListener('mouseleave', onLeave);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <footer className="d01__footer" ref={stageRef}>
+      <div className="d01__footer-bg" aria-hidden="true">
+        <span className="d01__footer-ghost">Taking on roles!</span>
+      </div>
+      <div className="d01__footer-inner">
+        <p className="d01__footer-kicker">Inquiries — route through the work</p>
+        <IntakeForm designId="01" />
+      </div>
+    </footer>
+  );
+}
 
 type Credit = {
   brand: string;
@@ -49,17 +107,62 @@ const CREDITS: Credit[] = [
   },
 ];
 
+type Cut = { id: string; title: string; caption: string; year: string; src: string; poster: string };
+
+const CUTS: Cut[] = [
+  {
+    id: 'CUT_01',
+    title: 'Scene 1',
+    caption: 'Reel · Cut 01 — dramatic.',
+    year: '2025',
+    src: '/video/cut-1.mp4',
+    poster: '/video/cut-1.jpg',
+  },
+  {
+    id: 'CUT_02',
+    title: 'Scene 2',
+    caption: 'Reel · Cut 02 — dialogue.',
+    year: '2025',
+    src: '/video/cut-2.mp4',
+    poster: '/video/cut-2.jpg',
+  },
+  {
+    id: 'CUT_03',
+    title: 'Scene 3',
+    caption: 'Reel · Cut 03 — range.',
+    year: '2025',
+    src: '/video/cut-3.mp4',
+    poster: '/video/cut-3.jpg',
+  },
+  {
+    id: 'CUT_04',
+    title: 'Scene 4',
+    caption: 'Reel · Cut 04 — close.',
+    year: '2025',
+    src: '/video/cut-4.mp4',
+    poster: '/video/cut-4.jpg',
+  },
+];
+
 export function Design01() {
   return (
     <article className="design d01" data-design="brutalist-bleed">
       <header className="d01__topbar">
         <span>Kevin Clark — Actor &amp; Model</span>
-        <span>Pittsburgh, PA · 412</span>
       </header>
 
       <section className="d01__main">
-        <h1 className="kc-h1 d01__h1" data-mode="single" data-stringtune="d01-h1">
-          <span>Kevin Clark</span>
+        <h1 className="kc-h1 d01__h1" aria-label="Kevin Clark">
+          {['Kevin', 'Clark'].map((word, i) => (
+            <span key={word} className="d01__h1-line" aria-hidden="true">
+              <span
+                className="d01__h1-inner"
+                style={{ ['--line' as string]: i }}
+              >
+                {word}
+              </span>
+            </span>
+          ))}
         </h1>
         <figure className="d01__photo">
           <img
@@ -81,16 +184,14 @@ export function Design01() {
         </div>
         <div>
           <dt>Base</dt>
-          <dd>Three Rivers</dd>
+          <dd>Pittsburgh, PA · 412</dd>
         </div>
       </dl>
 
       {/* ── WORKS ─────────────────────────────────────────────── */}
       <section className="d01__works" aria-labelledby="d01-works-h">
         <header className="d01__section-head">
-          <span className="d01__section-num">02</span>
           <h2 id="d01-works-h" className="d01__section-title">Selected Works</h2>
-          <span className="d01__section-count">{String(CREDITS.length).padStart(2, '0')} credits</span>
         </header>
 
         <ol className="d01__credits">
@@ -124,51 +225,34 @@ export function Design01() {
       {/* ── VIDEO ─────────────────────────────────────────────── */}
       <section className="d01__video" aria-labelledby="d01-video-h">
         <header className="d01__section-head">
-          <span className="d01__section-num">03</span>
           <h2 id="d01-video-h" className="d01__section-title">Reel</h2>
-          <span className="d01__section-count">16:9 · Placeholder</span>
         </header>
 
-        <figure className="d01__player">
-          <div className="d01__player-stage">
-            <video
-              className="d01__player-media"
-              poster="/photos/Actor%20in%20pittsburgh%20Kevin%20Clark.jpg"
-              preload="none"
-              playsInline
-              aria-label="Kevin Clark demo reel — placeholder"
-            />
-            <button
-              type="button"
-              className="d01__player-play"
-              aria-label="Play reel (placeholder — file pending)"
-              disabled
-            >
-              <span className="d01__player-play-mark" aria-hidden="true" />
-              <span className="d01__player-play-label">Play</span>
-            </button>
-            <div className="d01__player-hud" aria-hidden="true">
-              <span>REEL_001</span>
-              <span>00:00 / —:—</span>
-              <span>PGH · 2026</span>
-            </div>
-          </div>
-          <figcaption className="d01__player-caption">
-            Reel · Placeholder — file pending from agency.
-          </figcaption>
-        </figure>
+        <div className="d01__cuts">
+          {CUTS.map((cut) => (
+            <figure key={cut.id} className="d01__player">
+              <div className="d01__player-stage">
+                <video
+                  className="d01__player-media"
+                  src={cut.src}
+                  poster={cut.poster}
+                  preload="metadata"
+                  controls
+                  playsInline
+                  aria-label={`Kevin Clark reel — ${cut.title}`}
+                />
+              </div>
+              <figcaption className="d01__player-caption">
+                <span>{cut.caption}</span>
+                <span className="d01__player-year">{cut.year}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
       </section>
 
       {/* ── INFO ──────────────────────────────────────────────── */}
-      <section className="d01__info" aria-labelledby="d01-info-h">
-        <header className="d01__section-head">
-          <span className="d01__section-num">04</span>
-          <h2 id="d01-info-h" className="d01__section-title">Profile</h2>
-          <span className="d01__section-count">Data Sheet</span>
-        </header>
-
-        <p className="d01__eyebrow">Non-Union · Actively Submitting</p>
-
+      <section className="d01__info" aria-label="Profile">
         <div className="d01__info-grid">
           <div className="d01__info-block">
             <p className="d01__bio">
@@ -191,25 +275,26 @@ export function Design01() {
               </div>
               <div>
                 <dt>Status</dt>
-                <dd>Non-Union · Submitting</dd>
+                <dd>Non-Union · Actively Submitting</dd>
               </div>
             </dl>
           </div>
 
-          <aside className="d01__rep">
-            <p className="d01__rep-kicker">Representation</p>
-            <p className="d01__rep-agency">The Talent Group</p>
-            <a className="d01__rep-phone" href="tel:+14124718011">
-              412.471.8011
-            </a>
-            <p className="d01__rep-closer">Route inquiries through the agency.</p>
-          </aside>
+          <div className="d01__rep-col">
+            <h3 className="d01__rep-lead">11 Yrs Experience in Drama</h3>
+            <aside className="d01__rep">
+              <p className="d01__rep-kicker">Representation</p>
+              <p className="d01__rep-agency">The Talent Group</p>
+              <a className="d01__rep-phone" href="tel:+14124718011">
+                412.471.8011
+              </a>
+              <p className="d01__rep-closer">Route inquiries through the agency.</p>
+            </aside>
+          </div>
         </div>
       </section>
 
-      <footer className="d01__footer">
-        <IntakeForm designId="01" />
-      </footer>
+      <FooterReel />
     </article>
   );
 }
