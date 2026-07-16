@@ -1,0 +1,4 @@
+{
+  "name": "kevin-clark-actor",
+  "buildCommand": "npm run build"
+}
