@@ -24,12 +24,6 @@
   overflow: hidden;
 }
 
-/* Local switcher tokens — dark pill on cream. */
-.design.d13 {
-  --switcher-bg: rgba(21, 19, 15, 0.82);
-  --switcher-fg: var(--d13-bg);
-}
-
 /* Shared edge-label mono treatment. */
 .d13__edge,
 .d13__corner {

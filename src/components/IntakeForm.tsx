@@ -7,6 +7,11 @@ type Props = { designId?: string };
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
+// GitHub Pages hosts the static site but can't run /api/contact, so production
+// points at a separate Vercel project serving just that function (see DEPLOY.md).
+// Falls back to the relative path for local dev / an all-in-one Vercel deploy.
+const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_API_URL || '/api/contact';
+
 export function IntakeForm({ designId }: Props) {
   const [state, setState] = useState<Status>('idle');
   const [name, setName] = useState('');
@@ -39,7 +44,7 @@ export function IntakeForm({ designId }: Props) {
       designId,
     };
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(CONTACT_ENDPOINT, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(payload),

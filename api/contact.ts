@@ -27,6 +27,21 @@ type Payload = {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DESIGN_ID_RE = /^\d{2}$/;
 
+// The static site lives on kevinclarkofficial.com (GitHub Pages) while this
+// function runs on a separate Vercel project, so the browser treats calls
+// here as cross-origin and requires these headers plus an OPTIONS preflight.
+const ALLOWED_ORIGINS = new Set([
+  'https://kevinclarkofficial.com',
+  'https://www.kevinclarkofficial.com',
+  'http://localhost:5173',
+]);
+
+function corsOrigin(req: ReqLike): string | undefined {
+  const origin = req.headers.origin;
+  const value = Array.isArray(origin) ? origin[0] : origin;
+  return value && ALLOWED_ORIGINS.has(value) ? value : undefined;
+}
+
 function escapeHtml(input: string): string {
   return input
     .replace(/&/g, '&amp;')
@@ -43,8 +58,21 @@ function isNonEmptyString(v: unknown): v is string {
 export default async function handler(req: ReqLike, res: ResLike): Promise<void> {
   res.setHeader('Cache-Control', 'no-store');
 
+  const origin = corsOrigin(req);
+  if (origin) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type');
+  }
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
+    res.setHeader('Allow', 'POST, OPTIONS');
     res.status(405).json({ error: 'Method not allowed' });
     return;
   }

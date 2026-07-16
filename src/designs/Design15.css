@@ -30,9 +30,6 @@
   display: grid;
   grid-template-columns: var(--rail-w) 1fr var(--rail-w);
 
-  --switcher-bg: rgba(14, 13, 11, 0.88);
-  --switcher-fg: var(--fg);
-
   font-family: var(--font-serif);
   font-feature-settings: 'liga', 'kern', 'onum';
 }

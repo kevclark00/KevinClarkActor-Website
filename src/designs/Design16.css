@@ -22,9 +22,6 @@
   display: grid;
   grid-template-columns: 1fr min(560px, 90vw) 1fr;
 
-  --switcher-bg: rgba(13, 13, 12, 0.88);
-  --switcher-fg: var(--fg);
-
   font-family: var(--font-sans);
   font-feature-settings: 'ss01', 'cv11', 'kern';
 }

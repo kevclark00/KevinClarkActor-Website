@@ -89,47 +89,6 @@ input, textarea {
   display: inline-block;
 }
 
-/* Bottom-right switcher base styles. Designs may override colors via
-   --switcher-bg / --switcher-fg on the root design container. */
-.kc-switcher {
-  position: fixed;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  z-index: 100;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.625rem 0.875rem;
-  background: var(--switcher-bg, rgba(10, 10, 10, 0.78));
-  color: var(--switcher-fg, var(--fg));
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.kc-switcher__btn {
-  width: 1.75rem;
-  height: 1.75rem;
-  display: inline-grid;
-  place-items: center;
-  border-radius: 999px;
-  transition: background 220ms var(--ease-out);
-}
-
-.kc-switcher__btn:hover {
-  background: rgba(245, 241, 234, 0.12);
-}
-
-.kc-switcher__count {
-  min-width: 3.25rem;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-}
-
 /* Reduced motion respect — designs may layer further. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

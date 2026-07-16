@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Switcher } from './components/Switcher';
+import { useEffect, useMemo, useState } from 'react';
 import { StringTuneInit } from './stringtune/StringTuneInit';
 import { designs } from './designs';
-
-const HASH_PREFIX = '#/';
 
 function parseHashIndex(total: number): number {
   const m = window.location.hash.match(/^#\/(\d{1,2})$/);
@@ -13,28 +10,22 @@ function parseHashIndex(total: number): number {
   return Math.max(0, Math.min(total - 1, n));
 }
 
+// Production ships Design01 only. In dev, #/NN in the URL can still preview
+// the other sketches kept in the repo — there's no on-page switcher anymore.
+const ALLOW_HASH_ROUTING = import.meta.env.DEV;
+
 export function App() {
   const total = designs.length;
-  const [index, setIndex] = useState(() => parseHashIndex(total));
+  const [index, setIndex] = useState(() => (ALLOW_HASH_ROUTING ? parseHashIndex(total) : 0));
 
   useEffect(() => {
-    const id = String(index + 1).padStart(2, '0');
-    const next = `${HASH_PREFIX}${id}`;
-    if (window.location.hash !== next) {
-      window.history.replaceState(null, '', next);
-    }
-  }, [index]);
-
-  useEffect(() => {
+    if (!ALLOW_HASH_ROUTING) return;
     function onHash() {
       setIndex(parseHashIndex(total));
     }
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, [total]);
-
-  const prev = useCallback(() => setIndex((i) => (i - 1 + total) % total), [total]);
-  const next = useCallback(() => setIndex((i) => (i + 1) % total), [total]);
 
   const active = designs[index];
   const ActiveDesign = useMemo(() => active.Component, [active]);
@@ -45,13 +36,6 @@ export function App() {
       <main key={active.id} data-design-id={active.id}>
         <ActiveDesign />
       </main>
-      <Switcher
-        index={index}
-        total={total}
-        onPrev={prev}
-        onNext={next}
-        label={`${active.name} — ${active.blurb}`}
-      />
     </>
   );
 }

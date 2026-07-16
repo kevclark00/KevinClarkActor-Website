@@ -23,9 +23,6 @@
   color: var(--ink);
   min-height: 100dvh;
 
-  --switcher-bg: rgba(28, 24, 21, 0.92);
-  --switcher-fg: var(--paper);
-
   font-family: var(--font-serif);
   font-feature-settings: 'liga', 'kern', 'onum', 'pnum';
 }

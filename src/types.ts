@@ -1,7 +1,7 @@
 export type Design = {
-  /** Two-digit ID, e.g. "01" — used in URL hash and switcher label. */
+  /** Two-digit ID, e.g. "01" — used in the URL hash. */
   id: string;
-  /** Short display name shown in the switcher tooltip. */
+  /** Short display name for the design. */
   name: string;
   /** Short one-line note describing the visual concept. */
   blurb: string;

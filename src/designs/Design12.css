@@ -21,9 +21,6 @@
   color: var(--ink);
   min-height: 100dvh;
 
-  --switcher-bg: rgba(26, 22, 18, 0.88);
-  --switcher-fg: var(--paper);
-
   font-family: var(--font-serif);
   font-feature-settings: 'liga', 'kern', 'onum';
 
