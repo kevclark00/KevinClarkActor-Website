@@ -552,16 +552,28 @@
 
 @media (max-width: 720px) {
   .d01__credit {
-    grid-template-columns: 2rem 3.25rem 1fr auto;
-    gap: 0.75rem;
+    grid-template-columns: 2rem 3.25rem 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 0.75rem 0.75rem;
+    align-items: start;
   }
   .d01__credit-photo {
     width: 3.25rem;
     height: 3.25rem;
+    grid-row: 1 / 4;
+  }
+  .d01__credit-titlewrap {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .d01__credit-role {
+    grid-column: 3;
+    grid-row: 2;
+    font-size: 0.75rem;
   }
   .d01__credit-year {
-    grid-column: 3 / -1;
-    justify-self: end;
+    grid-column: 3;
+    grid-row: 3;
     font-size: 0.65rem;
   }
 }
