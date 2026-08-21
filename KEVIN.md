@@ -15,7 +15,7 @@ This should be prominent — Kevin wants viewers to know he's represented and ho
 
 ## Bio (verbatim, lightly cleaned)
 
-> Kevin Clark is an actor and model signed by The Talent Group, continuing to train in acting technique. He has acted in supporting and lead roles across several student and indie film productions since 2018.
+> Kevin Clark is an actor and model signed by The Talent Group, continuing to train on his acting technique. He has acted in supporting and lead roles across several student and indie film productions since 2018.
 >
 > **Education:** CCAC Theatre — A.S. Degree, 2017–2019.
 

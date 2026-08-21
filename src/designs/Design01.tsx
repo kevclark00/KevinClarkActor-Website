@@ -79,8 +79,11 @@ type Credit = {
   note: string;
   /** secondary line under the brand — used for film & TV genre */
   sub?: string;
-  /** photo | placeholder text */
+  /** watch link (YouTube) — wraps the brand name when present */
+  link?: string;
+  /** photo | video | placeholder text */
   photo?: { src: string; alt: string; position?: string };
+  video?: { src: string; poster: string; alt: string };
   placeholder?: string;
 };
 
@@ -89,16 +92,16 @@ const COMMERCIAL_CREDITS: Credit[] = [
     brand: 'Post University',
     role: 'Model',
     note: '2024',
-    photo: {
-      src: '/photos/pittsburgh%20actor%203.jpg',
-      alt: 'Kevin Clark — Post University campaign still',
-      position: 'center 25%',
+    video: {
+      src: '/video/post-university.mp4',
+      poster: '/video/post-university.jpg',
+      alt: 'Kevin Clark: on-set clip, Post University campaign',
     },
   },
   {
     brand: 'The Melting Pot',
     role: 'Hand Model',
-    note: '2023',
+    note: '2026',
     placeholder: 'MP',
   },
   {
@@ -113,8 +116,8 @@ const COMMERCIAL_CREDITS: Credit[] = [
   },
   {
     brand: 'American Eagle',
-    role: 'Internal Training Video',
-    note: '2024',
+    role: 'Internal Training Video x3',
+    note: '2022',
     photo: {
       src: '/photos/pittsburgh%20actor%204.jpg',
       alt: 'Kevin Clark — American Eagle campaign still',
@@ -124,7 +127,7 @@ const COMMERCIAL_CREDITS: Credit[] = [
   {
     brand: 'Head & Shoulders',
     role: 'Background Talent',
-    note: 'Commercial',
+    note: '2025',
     placeholder: 'HS',
   },
 ];
@@ -142,6 +145,7 @@ const FILM_TV_CREDITS: Credit[] = [
     sub: 'Horror',
     role: 'Lead',
     note: 'CCAC',
+    link: 'https://youtu.be/VQ3zb8pIf4c?si=n9syHVjKijHciGks',
     placeholder: 'TD',
   },
   {
@@ -156,6 +160,7 @@ const FILM_TV_CREDITS: Credit[] = [
     sub: 'Comedy',
     role: 'Lead',
     note: 'UnderTheRadarMedia',
+    link: 'https://youtu.be/zh68DK5_fq4?si=1VaZimoIDq1j2kOh',
     placeholder: 'MT',
   },
   {
@@ -163,6 +168,7 @@ const FILM_TV_CREDITS: Credit[] = [
     sub: 'Comedy',
     role: 'Lead',
     note: 'Chatham University',
+    link: 'https://youtu.be/ExpkywUU1WQ?is=YWOQ6xmWEsro_zj_',
     placeholder: 'PS',
   },
 ];
@@ -196,24 +202,24 @@ const CUTS: Cut[] = [
   },
   {
     id: 'CUT_02',
-    title: 'Scene 2',
-    caption: 'Reel · Cut 02 — dialogue.',
+    title: 'Comedic - Flirt / Musical',
+    caption: 'Reel · Cut 02: Comedic - Flirt / Musical.',
     year: '2025',
     src: '/video/cut-2.mp4',
     poster: '/video/cut-2.jpg',
   },
   {
     id: 'CUT_03',
-    title: 'Scene 3',
-    caption: 'Reel · Cut 03 — range.',
+    title: 'Nurse',
+    caption: 'Reel · Cut 03: Nurse.',
     year: '2025',
     src: '/video/cut-3.mp4',
     poster: '/video/cut-3.jpg',
   },
   {
     id: 'CUT_04',
-    title: 'Scene 4',
-    caption: 'Reel · Cut 04 — close.',
+    title: 'Detective',
+    caption: 'Reel · Cut 04: Detective.',
     year: '2025',
     src: '/video/cut-4.mp4',
     poster: '/video/cut-4.jpg',
@@ -231,7 +237,19 @@ function CreditList({ credits }: { credits: Credit[] }) {
         >
           <span className="d01__credit-idx">{String(i + 1).padStart(2, '0')}</span>
           <div className="d01__credit-photo" aria-hidden="true">
-            {c.photo ? (
+            {c.video ? (
+              <video
+                className="d01__credit-video"
+                src={c.video.src}
+                poster={c.video.poster}
+                autoPlay={!prefersReducedMotion}
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                aria-label={c.video.alt}
+              />
+            ) : c.photo ? (
               <img
                 src={c.photo.src}
                 alt={c.photo.alt}
@@ -243,7 +261,18 @@ function CreditList({ credits }: { credits: Credit[] }) {
             )}
           </div>
           <div className="d01__credit-titlewrap">
-            <span className="d01__credit-brand">{c.brand}</span>
+            {c.link ? (
+              <a
+                className="d01__credit-brand d01__credit-link"
+                href={c.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {c.brand}
+              </a>
+            ) : (
+              <span className="d01__credit-brand">{c.brand}</span>
+            )}
             {c.sub && <span className="d01__credit-sub">{c.sub}</span>}
           </div>
           <span className="d01__credit-role">{c.role}</span>
@@ -266,6 +295,29 @@ export function Design01() {
               Rep: The Talent Group - <a href="tel:+14124718011">412.471.8011</a>
             </span>
             <span className="d01__topbar-cats">Film &amp; Television | Commercial &amp; Print</span>
+            <span className="d01__topbar-social">
+              <a
+                href="https://www.facebook.com/profile.php?id=61584919451796&mibextid=wwXIfr"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Facebook
+              </a>
+              <a
+                href="https://www.instagram.com/kevinclark.official?igsh=MTlzd2hwYmpwbmM2dQ%3D%3D&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Instagram
+              </a>
+              <a
+                href="https://www.youtube.com/@KevinClark.Official"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                YouTube
+              </a>
+            </span>
           </div>
         </header>
         <div className="d01__main">
@@ -289,6 +341,7 @@ export function Design01() {
               src="/photos/model%20in%20pittsburgh%20portrait.jpg"
               alt="Kevin Clark portrait"
               loading="eager"
+              style={{ objectPosition: 'center top' }}
             />
           </figure>
         </div>
@@ -350,7 +403,7 @@ export function Design01() {
           <div className="d01__info-block">
             <p className="d01__bio">
               Kevin Clark is an actor and model signed by The Talent Group, continuing to
-              train in acting technique. He has acted in supporting and lead roles across
+              train on his acting technique. He has acted in supporting and lead roles across
               several student and indie film productions since 2018.
             </p>
             <dl className="d01__data">
@@ -418,6 +471,13 @@ export function Design01() {
                   rel="noopener noreferrer"
                 >
                   Facebook
+                </a>
+                <a
+                  href="https://www.youtube.com/@KevinClark.Official"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  YouTube
                 </a>
               </div>
             </aside>
