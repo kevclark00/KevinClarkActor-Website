@@ -13,3 +13,5 @@ branch someone else's account owns/deploys from.
 - **Protocol library** `~/Documents/` (index: `~/Documents/context-crumbs-protocol.md`): check the index before improvising a procedure for any domain; arm the domain doc first.
 - **Docs taxonomy** (`~/Documents/repo-docs-taxonomy-protocol.md`): `devlog/` = dated journal; `protocols/` = sparing arm-first project doctrine, each crumbed here; `docs/` = guides only.
 - **Bucket:** "Kevin Clark" `4321714a-dd7f-4270-b798-a172146e7475` — start the tracker here per the motherboard startup routine.
+
+Security floor (2026-10-27): vite 6.4.5, postcss 8.5.32, nanoid 3.3.20, browserslist 4.29.5, source-map-js 1.2.2. Do not downgrade or regenerate the lockfile below these.
